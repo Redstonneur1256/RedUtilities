@@ -28,6 +28,6 @@ ext.remoteDownload = { String url, String name ->
 }
 
 dependencies {
-    compile remoteDownload("https://github.com/Redstonneur1256/RedUtilities/releases/download/{redUtilitiesVersion}/RedUtilities.jar", "RedUtilities.jar")
+    compile remoteDownload("https://github.com/Redstonneur1256/RedUtilities/releases/download/${redUtilitiesVersion}/RedUtilities.jar", "RedUtilities.jar")
 }
 ```
