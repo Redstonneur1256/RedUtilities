@@ -1,10 +1,7 @@
 package fr.redstonneur1256.redutilities.io;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
@@ -15,11 +12,16 @@ public class Http {
     private String url;
     private Map<String, String> properties;
     private int timeout;
+    private String method;
+    private byte[] payload;
     private Proxy proxy;
+    private int responseCode;
     public Http(String url) {
         this.url = url;
         this.properties = new HashMap<>();
         this.timeout = 1000;
+        this.method = "GET";
+        this.payload = null;
         this.proxy = Proxy.NO_PROXY;
     }
 
@@ -30,6 +32,16 @@ public class Http {
 
     public Http timeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    public Http method(String method) {
+        this.method = method;
+        return this;
+    }
+
+    public Http payload(byte[] payload) {
+        this.payload = payload;
         return this;
     }
 
@@ -50,10 +62,17 @@ public class Http {
         URL url = new URL(this.url);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
         connection.setConnectTimeout(timeout);
+        connection.setRequestMethod(method);
+        if(payload != null) {
+            connection.setDoOutput(true);
+            OutputStream output = connection.getOutputStream();
+            output.write(payload);
+        }
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             connection.addRequestProperty(entry.getKey(), entry.getValue());
         }
-        return connection.getInputStream();
+        responseCode = connection.getResponseCode();
+        return responseCode / 100 == 2 ? connection.getInputStream() : connection.getErrorStream();
     }
 
     public String readSilent() {
@@ -72,6 +91,10 @@ public class Http {
             output.append(line).append("\n");
         }
         return output.toString();
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 
     public static Http url(String url) {
