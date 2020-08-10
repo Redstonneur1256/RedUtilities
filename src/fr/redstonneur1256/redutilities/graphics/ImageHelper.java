@@ -21,11 +21,41 @@ public class ImageHelper {
         return resize(original, original.getWidth(), original.getHeight());
     }
 
+    public static int getAverageColor(BufferedImage image) {
+        int a = 0;
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        boolean hasAlpha = image.getType() == BufferedImage.TYPE_INT_ARGB;
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int rgb = image.getRGB(x, y);
+                a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF;
+                r += (rgb >> 16) & 0xFF;
+                g += (rgb >> 8) & 0xFF;
+                b += (rgb) & 0xFF;
+            }
+        }
+
+        float size = (image.getWidth() * image.getHeight());
+
+        a = (int) Math.floor(a / size);
+        r = (int) Math.floor(r / size);
+        g = (int) Math.floor(g / size);
+        b = (int) Math.floor(b / size);
+
+        return  ((a & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8) |
+                (b & 0xFF);
+
+    }
+
     public static void drawCenteredImageRounded(Graphics graphics, BufferedImage image, int x, int y, ImageObserver observer) {
         drawCenteredImageRounded(graphics, image, x, y, image.getHeight(), image.getWidth(), observer);
     }
 
-    public static void drawCenteredImageRounded(Graphics graphics, BufferedImage image, int x, int y, int height, int width, ImageObserver observer) {
+    public static void drawCenteredImageRounded(Graphics graphics, BufferedImage image, int x, int y, int width, int height, ImageObserver observer) {
         Shape shape = graphics.getClip();
         int xx = x - (width / 2);
         int yy = y - (height / 2);
@@ -47,7 +77,7 @@ public class ImageHelper {
         drawCenteredImage(graphics, image, x, y, image.getHeight(), image.getWidth(), observer);
     }
 
-    public static void drawCenteredImage(Graphics graphics, BufferedImage image, int x, int y, int height, int width, ImageObserver observer) {
+    public static void drawCenteredImage(Graphics graphics, BufferedImage image, int x, int y, int width, int height, ImageObserver observer) {
         int xx = x - (width / 2);
         int yy = y - (height / 2);
         graphics.drawImage(image, xx, yy, width, height, observer);
