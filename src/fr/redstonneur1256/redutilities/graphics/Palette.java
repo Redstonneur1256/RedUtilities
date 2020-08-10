@@ -33,9 +33,15 @@ public class Palette<T extends Palette.ColorContainer> {
         return this;
     }
 
+    public boolean useCache() { return this.useCache; }
+
     public Palette<T> addColor(T t) {
         this.colors.add(t);
         return this;
+    }
+
+    public List<T> getColors() {
+        return colors;
     }
 
     public void importFrom(File file, Function<Color, T> supplier) throws IOException {
@@ -58,10 +64,6 @@ public class Palette<T extends Palette.ColorContainer> {
         output.flush();
         output.close();
         System.out.println("Exported " + colors.size() + " colors to file " + file);
-    }
-
-    public List<T> getColors() {
-        return colors;
     }
 
     public T matchColor(int rgb) {
