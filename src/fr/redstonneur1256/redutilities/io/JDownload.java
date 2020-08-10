@@ -1,5 +1,7 @@
 package fr.redstonneur1256.redutilities.io;
 
+import fr.redstonneur1256.redutilities.Utils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +12,8 @@ import java.net.URL;
 import java.util.*;
 
 public class JDownload {
+
+    public static boolean debug = false;
     
     private URL url;
     private Map<String, String> properties;
@@ -79,7 +83,7 @@ public class JDownload {
         for (Map.Entry<String, String> property : properties.entrySet()) {
             debug("  " + property.getKey() + " = " + property.getValue());
         }
-        debug("Buffer size = " + sizeFormat(bufferSize) + " (" + bufferSize + ")");
+        debug("Buffer size = " + Utils.sizeFormat(bufferSize, "B") + " (" + bufferSize + ")");
         debug("Output directory =  " + output.getParent());
         debug("Output file = " + output.getName());
         debug("Downloaded bytes = " + downloadedBytes);
@@ -164,7 +168,7 @@ public class JDownload {
         downloadSize = urlConnection.getContentLengthLong();
         InputStream inputStream = urlConnection.getInputStream();
 
-        debug("Content size = " + sizeFormat(downloadSize) + " (" + downloadSize+ ")");
+        debug("Content size = " + Utils.sizeFormat(downloadSize, "B") + " (" + downloadSize+ ")");
 
         info("Starting download from URL " + url);
 
@@ -231,6 +235,10 @@ public class JDownload {
         listenerList.add(listener);
     }
 
+    public void addProperty(String key, String name) {
+        properties.put(name, key);
+    }
+
     public JDownload copy() {
         return new JDownload(this);
     }
@@ -294,8 +302,8 @@ public class JDownload {
         for (int i = progress + 1; i < length; i++) {
             builder.append(" ");
         }
-        builder.append("] ").append(sizeFormat(speed)).append("/s").append(" ").append(sizeFormat(downloadedBytes))
-                .append("/").append(sizeFormat(downloadSize));
+        builder.append("] ").append(Utils.sizeFormat(speed, "B")).append("/s").append(" ").append(Utils.sizeFormat(downloadedBytes, "B"))
+                .append("/").append(Utils.sizeFormat(downloadSize, "B"));
 
         return builder.toString();
     }
@@ -317,17 +325,6 @@ public class JDownload {
     
     // Internal methods:
 
-    private static String sizeFormat(long size) {
-        String[] units = new String[] {"B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB, YB"};
-        int index = 0;
-        double temp = size;
-        while(temp >= 1024 && index < units.length - 1) {
-            temp /= 1024;
-            index++;
-        }
-        return String.format("%.2f %s", temp, units[index]);
-    }
-
     private void setStatus(Status status) {
         for (DownloadListener downloadListener : listenerList) {
             downloadListener.statusChanged(this, this.status, status);
@@ -345,7 +342,8 @@ public class JDownload {
         System.err.println("FATAL: " + message);
     }
     private static void debug(String message) {
-        //System.out.println("DEBUG: " + message);
+        if(debug)
+            System.out.println("DEBUG: " + message);
     }
 
 }
