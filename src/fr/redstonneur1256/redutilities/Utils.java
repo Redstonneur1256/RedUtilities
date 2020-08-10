@@ -44,21 +44,18 @@ public class Utils {
         return URL_PATTERN.matcher(url).matches();
     }
 
-    public static String sizeFormat(double size) {
+    public static String sizeFormat(long size) {
         return sizeFormat(size, "o");
     }
-    public static String sizeFormat(double size, String unit) {
-        return sizeFormat((long) size, unit);
-    }
     public static String sizeFormat(long size, String unit) {
-        final String[] suffixes = new String[] {"", "K", "M", "G", "T"};
+        String[] units = new String[] {"", "K", "M", "G", "T", "P", "E", "Z, Y"};
         double tmpSize = size;
         int index = 0;
-        while (tmpSize >= 1024 && index < 4) {
+        while (tmpSize >= 1024 && index < units.length - 1) {
             tmpSize /= 1024.0;
             index++;
         }
-        return String.format("%.2f %s%s", tmpSize, suffixes[index], unit);
+        return String.format("%.2f %s%s", tmpSize, units[index], unit);
     }
 
 }
