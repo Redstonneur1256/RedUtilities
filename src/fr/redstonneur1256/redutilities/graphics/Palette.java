@@ -2,6 +2,7 @@ package fr.redstonneur1256.redutilities.graphics;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,19 +70,17 @@ public class Palette<T extends Palette.ColorContainer> {
 
     public BufferedImage toImage(T[] data, int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = (Graphics2D) image.getGraphics();
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                T t = data[x + y * width];
+                int index = x + y * width;
+                T t = data[index];
                 if (t == null)
                     continue;
 
-                graphics.setColor(t.getColor());
-                graphics.fillRect(x, y, 1, 1);
-
+                pixels[index] = t.getColorRGB();
             }
         }
-        graphics.dispose();
         return image;
     }
 
