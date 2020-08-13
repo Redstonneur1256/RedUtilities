@@ -26,11 +26,11 @@ public class ImageHelper {
         int r = 0;
         int g = 0;
         int b = 0;
-        boolean hasAlpha = image.getType() == BufferedImage.TYPE_INT_ARGB;
+        boolean hasAlpha = hasAlpha(image);
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 int rgb = image.getRGB(x, y);
-                a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF;
+                a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF000000;
                 r += (rgb >> 16) & 0xFF;
                 g += (rgb >> 8) & 0xFF;
                 b += (rgb) & 0xFF;
@@ -49,6 +49,12 @@ public class ImageHelper {
                 ((g & 0xFF) << 8) |
                 (b & 0xFF);
 
+    }
+
+    public static boolean hasAlpha(BufferedImage image) {
+        int type = image.getType();
+        return type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_ARGB_PRE ||
+                type == BufferedImage.TYPE_4BYTE_ABGR || type == BufferedImage.TYPE_4BYTE_ABGR_PRE;
     }
 
     public static void drawCenteredImageRounded(Graphics graphics, BufferedImage image, int x, int y, ImageObserver observer) {
