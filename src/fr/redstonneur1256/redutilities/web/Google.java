@@ -6,10 +6,6 @@ import org.apache.commons.lang3.Validate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -18,25 +14,25 @@ import java.util.List;
 public class Google {
 
     private static final String GOOGLE_URL = "https://www.googleapis.com/customsearch/v1?safe=medium&cx=%s&key=%s&num=%d&q=%s";
-    private static String API_KEY;
-    private static String USER_AGENT;
+    private static String apiKey;
+    private static String userAgent;
 
     public static void setup(String key, String userAgent) {
-        API_KEY = key;
-        USER_AGENT = userAgent;
+        Google.apiKey = key;
+        Google.userAgent = userAgent;
     }
 
     public static List<Result> search(String keywords) {
-        Validate.notEmpty(API_KEY, "Api key cannot be null or empty");
-        Validate.notEmpty(USER_AGENT, "User Agent cannot be null or empty");
+        Validate.notEmpty(apiKey, "Api key cannot be null or empty");
+        Validate.notEmpty(userAgent, "User Agent cannot be null or empty");
 
         List<Result> list = new ArrayList<>();
 
         try {
             String search = URLEncoder.encode(keywords, "UTF-8");
-            String searchUrl = String.format(GOOGLE_URL, "018291224751151548851%3Ajzifriqvl1o", API_KEY, 10, search);
+            String searchUrl = String.format(GOOGLE_URL, "018291224751151548851%3Ajzifriqvl1o", apiKey, 10, search);
 
-            String json = Http.url(searchUrl).property("User-Agent", USER_AGENT).read();
+            String json = Http.url(searchUrl).property("User-Agent", userAgent).read();
 
             JSONObject object = new JSONObject(json);
             if(!object.has("items")) {

@@ -185,6 +185,18 @@ public class JDownload {
         listeners.remove(listener);
     }
 
+    public void setProperty(String name, String value) {
+        properties.put(name, value);
+    }
+
+    public void removeProperty(String name) {
+        properties.remove(name);
+    }
+
+    public String getProperty(String name) {
+        return properties.get(name);
+    }
+
     public String createBar(int length, String fill, String empty) {
         int progress = (int) (getProgress() * length);
 

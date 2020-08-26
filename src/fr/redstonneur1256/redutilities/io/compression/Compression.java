@@ -5,8 +5,6 @@ import fr.redstonneur1256.redutilities.io.compression.methods.Zip;
 import fr.redstonneur1256.redutilities.io.compression.methods.ZLib;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import java.util.function.Supplier;
 
 public class Compression {
 
@@ -16,7 +14,7 @@ public class Compression {
     private static ByteArrayOutputStream output;
     private static byte[] tempBuffer;
     static {
-        setMethod(Method.ZLIB);
+        setMethod(Method.zLib);
         setThreadSafe(false);
         setBufferSize(1024);
     }
@@ -60,9 +58,9 @@ public class Compression {
     }
 
     public enum Method {
-        GZIP(new GZip()),
-        ZIP(new Zip()),
-        ZLIB(new ZLib());
+        gZip(new GZip()),
+        zip(new Zip()),
+        zLib(new ZLib());
 
         private CompressionProcessor processor;
         Method(CompressionProcessor processor) {
