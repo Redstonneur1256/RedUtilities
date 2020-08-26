@@ -1,349 +1,251 @@
 package fr.redstonneur1256.redutilities.io;
 
-import fr.redstonneur1256.redutilities.Utils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
 public class JDownload {
 
-    public static boolean debug = false;
-    
-    private URL url;
+    public static final int defaultBuffer;
+    static {
+        defaultBuffer = 1024 * 8; // 8 KB Buffer
+    }
+
+    private String url;
+    private OutputStream output;
+    private byte[] buffer;
     private Map<String, String> properties;
-    private File output;
-    private int bufferSize;
+    private List<Listener> listeners;
     private Status status;
+    private InputStream input;
     private long downloadSize;
     private long downloadedBytes;
     private long speed;
-    private List<DownloadListener> listenerList;
+
+    public JDownload(String url, OutputStream output, int bufferSize) {
+        this.url = url;
+        this.output = output;
+        this.buffer = new byte[bufferSize];
+        this.properties = new HashMap<>();
+        this.status = Status.stopped;
+        this.listeners = new ArrayList<>();
+
+        this.input = null;
+        this.downloadSize = -1;
+        this.downloadedBytes = 0;
+        this.speed = 0;
+    }
+
+    public JDownload(String url, OutputStream output) {
+        this(url, output, defaultBuffer);
+    }
+
+    public JDownload(String url, File file) throws FileNotFoundException {
+        this(url, new FileOutputStream(file));
+    }
+
+    public JDownload(String url, File file, int bufferSize) throws FileNotFoundException {
+        this(url, new FileOutputStream(file), bufferSize);
+    }
 
     private JDownload(JDownload original) {
-        // Internal constructor to copy it.
         this.url = original.url;
-        this.properties = new HashMap<>(original.properties);
         this.output = original.output;
-        this.bufferSize = original.bufferSize;
-        this.status = Status.STOPPED;
-        this.downloadSize = 0;
+        this.buffer = new byte[original.buffer.length];
+        this.properties = new HashMap<>(original.properties);
+        this.status = Status.stopped;
+        this.listeners = new ArrayList<>(original.listeners);
+
+        this.input = null;
+        this.downloadSize = -1;
         this.downloadedBytes = 0;
         this.speed = 0;
-        this.listenerList = new ArrayList<>(original.listenerList);
-    }
-
-    public JDownload(String url, File output) throws MalformedURLException {
-        this(url, output, 1024);
-    }
-
-    public JDownload(String url, File output, int bufferSize) throws MalformedURLException {
-        this.url = new URL(url);
-        this.properties = new HashMap<>();
-        this.output = output;
-        this.bufferSize = bufferSize;
-        this.status = Status.STOPPED;
-        this.downloadSize = 0;
-        this.downloadedBytes = 0;
-        this.speed = 0;
-        this.listenerList = new ArrayList<>();
-
-        this.properties.put("User-Agent", "JDownloader");
 
     }
 
-    /**
-     * @see JDownload#start(boolean)
-     */
-    public void start() throws IOException {
-        start(false);
+
+    public void connect() throws IOException {
+        connect(false);
     }
 
-    /**
-     * Start the download
-     *
-     * @param shouldRetry if the download should shouldRetry in case of fail
-     * @throws IOException if the download failed
-     * @throws IllegalStateException if the download is already complete
-     */
-    public void start(boolean shouldRetry) throws IOException {
-        if(status == Status.COMPLETE) {
-            throw new IllegalStateException("Download is already complete, to start it back use JDownload#copy()");
+    public void connect(boolean shouldRetry) throws IOException {
+        if(status == Status.connected || status == Status.connecting) {
+            throw new IllegalStateException("Download is already connected, use JDownload#copy() for multiple downloads");
+        }
+        if(status == Status.complete || status == Status.cancelled) {
+            throw new IllegalStateException("Download is complete or have been cancelled, use JDownload#copy() for multiple downloads");
         }
 
-        debug("Starting download...");
-        debug("Download URL = " + url);
-        debug("Should retry = " + shouldRetry);
-        debug("Connection properties:");
-        for (Map.Entry<String, String> property : properties.entrySet()) {
-            debug("  " + property.getKey() + " = " + property.getValue());
-        }
-        debug("Buffer size = " + Utils.sizeFormat(bufferSize, "B") + " (" + bufferSize + ")");
-        debug("Output directory =  " + output.getParent());
-        debug("Output file = " + output.getName());
-        debug("Downloaded bytes = " + downloadedBytes);
-
-        setStatus(Status.STARTING);
-
-        File downloadFile = new File(output.getAbsolutePath() + ".jdl");
-
-        if(status != Status.PAUSED) { // Does not need to check back all files if download is paused.
-
-            if(!output.exists()) {
-                File parent = output.getParentFile();
-                if(!parent.exists()) {
-                    info("Parent directory ('" + parent.getAbsolutePath() + "') does not exist.");
-                    if(!parent.mkdirs()) {
-                        info("Could not create the parent file '" + parent.getAbsolutePath() + "'");
-                    }
-                }
+        setStatus(Status.connecting);
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            for(Map.Entry<String, String> property : properties.entrySet()) {
+                connection.addRequestProperty(property.getKey(), property.getValue());
             }
+            connection.connect();
 
-            if(!downloadFile.exists() && output.exists()) {
-                if(!output.renameTo(downloadFile)) {
-                    warn("Cannot rename existing file to temporary JDL file, creating a new one");
-                }
-            }
-        }
+            int code = connection.getResponseCode();
 
-        RandomAccessFile file = new RandomAccessFile(downloadFile, "rw");
+            boolean ok = code / 100 == 2;
 
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-        for (Map.Entry<String, String> property : properties.entrySet()) {
-            urlConnection.setRequestProperty(property.getKey(), property.getValue());
-        }
-
-        urlConnection.setRequestProperty("Range", "bytes=" + downloadedBytes + "-");
-
-        long start = System.currentTimeMillis();
-        urlConnection.connect();
-        long end = System.currentTimeMillis();
-        debug("Connected, time = " + (end - start) + "ms");
-        debug("Connection response code = " + urlConnection.getResponseCode());
-
-        int code = urlConnection.getResponseCode();
-
-        if(code / 100 != 2) {
-            warn("Got wrong response code for URL '" + url + "' (" + code + ")");
-            switch (code) {
-                case 301:
-                case 302:
-                    boolean permanent = code == 301;
-                    url = new URL(urlConnection.getHeaderField("Location"));
-
-                    info("Swapping to: '" + url + "' (" + (permanent ? "Permanent" : "Temporary") + " redirect)");
-                    if(shouldRetry) {
-                        start(false);
+            if(!ok) {
+                switch(code) {
+                    case 301:
+                    case 302:
+                        url = connection.getHeaderField("Location");
+                        if(shouldRetry) {
+                            connect(false);
+                        }
                         return;
-                    }
-                    break;
-                case 304: // Not edited
-                    info("File not modified from last request (304)");
-                    // Normally end download:
-                    if(!downloadFile.renameTo(output)) {
-                        warn("Can't rename file to original name.");
-                    }
-                    setStatus(Status.COMPLETE);
-                    return;
-                case 401:
-                case 403:
-                    fatal("Server denied access to file.");
-                    break;
-                case 404:
-                    fatal("Server returned 404 (Not Found) for URL ('" + url + "') ");
-                    break;
-                default:
-                    break;
+                    case 401:
+                        throw new IllegalStateException("Server returned code 401 (Unauthorized)");
+                    case 403:
+                        throw new IllegalStateException("Server returned code 403 (Forbidden)");
+                    case 404:
+                        throw new IllegalStateException("Server returned code 404 (Not Found)");
+                }
             }
-            setStatus(Status.STOPPED);
-            return;
+
+            input = ok ? connection.getInputStream() : connection.getErrorStream();
+            downloadSize = connection.getContentLengthLong();
+
+            setStatus(Status.connected);
+        }catch(IOException exception) {
+            setStatus(Status.stopped);
+            throw new IOException(exception);
         }
+    }
 
-        downloadSize = urlConnection.getContentLengthLong();
-        InputStream inputStream = urlConnection.getInputStream();
+    public void download() throws IOException {
+        if(status != Status.connected) {
+            throw new IllegalStateException("Download is not connected.");
+        }
+        setStatus(Status.downloading);
 
-        debug("Content size = " + Utils.sizeFormat(downloadSize, "B") + " (" + downloadSize+ ")");
-
-        info("Starting download from URL " + url);
-
-        setStatus(Status.DOWNLOADING);
-
-        Timer timer = new Timer();
-        long updatesPerSecond = 20;
-        timer.scheduleAtFixedRate(new TimerTask() {
-            private long lastDownloadedBytes = 0;
+        Timer updateTimer = new Timer("JDownload Speed");
+        updateTimer.schedule(new TimerTask() {
+            private long lastDownloadedBytes = downloadedBytes;
             @Override
             public void run() {
-                if(status != Status.DOWNLOADING) {
-                    timer.cancel();
-                    return;
-                }
-                speed = (downloadedBytes - lastDownloadedBytes) * updatesPerSecond;
+                speed = (downloadedBytes - lastDownloadedBytes);
                 lastDownloadedBytes = downloadedBytes;
-                for (DownloadListener downloadListener : listenerList) {
-                    downloadListener.speedChanged(JDownload.this);
+                for(Listener listener : listeners) {
+                    listener.speedChanged(speed);
                 }
             }
-        }, 1000, 1000 / updatesPerSecond);
+        }, 1000, 1000);
 
-        byte[] buffer = new byte[bufferSize];
-        int length;
-
-        start = System.currentTimeMillis();
-        while(status == Status.DOWNLOADING) {
-            length = inputStream.read(buffer);
-            if(length == -1) {
+        int count;
+        while(status == Status.downloading) {
+            count = input.read(buffer);
+            if(count < 0) {
+                setStatus(Status.complete);
                 break;
             }
-            downloadedBytes += length;
-            file.write(buffer, 0, length);
-        }
-        end = System.currentTimeMillis();
-        debug("Download complete, time = " + (end - start) + "ms");
-
-        file.close();
-
-        if(!downloadFile.renameTo(output)) {
-            boolean done = output.delete() && downloadFile.renameTo(output);
-            if(!done)
-                warn("Can't rename file to original name.");
+            output.write(buffer, 0, count);
+            downloadedBytes += count;
         }
 
-        for (DownloadListener downloadListener : listenerList) {
-            downloadListener.downloadComplete(this, output);
+        updateTimer.cancel();
+
+        if(status == Status.complete) {
+            output.close();
+            listeners.forEach(Listener::downloadComplete);
         }
-        
-        info("Download complete.");
-
-        setStatus(Status.COMPLETE);
     }
 
-    /**
-     * Pause the download, can be resumed calling back <code>JDownload#start()</code>
-     */
-    public void pause() {
-        setStatus(Status.PAUSED);
-    }
-    
-    public void addListener(DownloadListener listener) {
-        listenerList.add(listener);
+    public void pauseDownload() {
+        setStatus(Status.connected);
     }
 
-    public void addProperty(String key, String name) {
-        properties.put(name, key);
+    public void cancel() {
+        if(status != Status.connected) {
+            throw new IllegalStateException("Cannot cancel the download while in status " + status.name());
+        }
+        setStatus(Status.cancelled);
+        try {
+            if(input != null) {
+                input.close();
+            }
+        }catch(IOException exception) {
+            throw new IllegalStateException("Cannot close input");
+        }
     }
 
     public JDownload copy() {
         return new JDownload(this);
     }
 
-    /**
-     * @return the current downloaded bytes count
-     */
-    public long getDownloadedBytes() {
-        return downloadedBytes;
+    public void addListener(Listener listener) {
+        listeners.add(listener);
     }
 
-    /**
-     * @return the size of the file after the download (in bytes)
-     */
-    public long getDownloadSize() {
-        return downloadSize;
+    public void removeListener(Listener listener) {
+        listeners.remove(listener);
     }
 
-    /**
-     * Get the current download progress
-     * @return the download progress from 0 to 1
-     */
-    public double getProgress() {
-        return downloadedBytes / (double) downloadSize;
-    }
-
-    /**
-     * Get the download speed
-     * @return the download speed from last second (in bytes)
-     */
-    public long getSpeed() {
-        return speed;
-    }
-
-    /**
-     * @return the download status
-     */
-    public Status getStatus() {
-        return status;
-    }
-
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    /**
-     * Generate a progress bar of the download
-     * @param length the length of the bar inside the []
-     * @return The progress bar
-     */
-    public String progressBar(int length) {
-        StringBuilder builder = new StringBuilder();
-
+    public String createBar(int length, String fill, String empty) {
         int progress = (int) (getProgress() * length);
 
-        builder.append("[");
-        for (int i = 0; i < progress; i++) {
-            builder.append("=");
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < length; i++) {
+            builder.append(i < progress ? fill : empty);
         }
-        builder.append(">");
-        for (int i = progress + 1; i < length; i++) {
-            builder.append(" ");
-        }
-        builder.append("] ").append(Utils.sizeFormat(speed, "B")).append("/s").append(" ").append(Utils.sizeFormat(downloadedBytes, "B"))
-                .append("/").append(Utils.sizeFormat(downloadSize, "B"));
-
         return builder.toString();
     }
 
+    public String getURL() { return url; }
+    public Status getStatus() { return status; }
+    public long getDownloadSize() { return downloadSize; }
+    public long getDownloadedBytes() { return downloadedBytes; }
+    public long getSpeed() { return speed; }
+
+    /**
+     * @return the download progress from 0 to 1 or -1 if the download size is unknown
+     */
+    public double getProgress() {
+        return downloadSize == -1 ? -1 : downloadedBytes / (double) downloadSize;
+    }
+
+    /* Classes */
 
     public enum Status {
-        STOPPED(),
-        STARTING(),
-        DOWNLOADING(),
-        PAUSED(),
-        COMPLETE()
+        stopped,
+        connecting,
+        connected,
+        downloading,
+        complete,
+        cancelled
     }
 
-    public static abstract class DownloadListener {
-        public void downloadComplete(JDownload download, File file) { }
-        public void statusChanged(JDownload download, Status oldStatus, Status newStatus) { }
-        public void speedChanged(JDownload download) { }
+    public interface Listener {
+        void speedChanged(long speed);
+        void statusChanged(Status status);
+        void downloadComplete();
     }
-    
-    // Internal methods:
+
+    public static class ListenerAdapter implements Listener {
+
+        @Override
+        public void speedChanged(long speed) { }
+
+        @Override
+        public void statusChanged(Status status) { }
+
+        @Override
+        public void downloadComplete() { }
+
+    }
+
+    /* Internal methods */
 
     private void setStatus(Status status) {
-        for (DownloadListener downloadListener : listenerList) {
-            downloadListener.statusChanged(this, this.status, status);
-        }
         this.status = status;
-    }
 
-    private static void info(String message) {
-        System.out.println("INFO: " + message);
-    }
-    private static void warn(String message) {
-        System.err.println("WARN: " + message);
-    }
-    private static void fatal(String message) {
-        System.err.println("FATAL: " + message);
-    }
-    private static void debug(String message) {
-        if(debug)
-            System.out.println("DEBUG: " + message);
+        for(Listener listener : listeners) {
+            listener.statusChanged(status);
+        }
     }
 
 }

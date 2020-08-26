@@ -6,12 +6,12 @@ How to use in my project
 
 Option 1: Manual download
 -----
-Download the jar file from https://github.com/Redstonneur1256/RedUtilities/releases and add it to your project
+Download the jar file from [releases page](https://github.com/Redstonneur1256/RedUtilities/releases) and add it to your project
 
 Option 2: Using gradle
 -----
 ```gradle
-ext.redUtilitiesVersion = "1.1.1"
+ext.redUtilitiesVersion = "1.2"
 ext.remoteDownload = { String url, String name ->
     File file = new File("$buildDir/lib/${name}");
     if (!file.exists()) {

@@ -9,23 +9,23 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    private static final Gson GSON;
-    private static final Pattern URL_PATTERN;
+    private static final Gson gson;
+    private static final Pattern urlPattern;
 
     static {
-        GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-        URL_PATTERN = Pattern.compile("^(?i)https?://[a-z0-9]*.[a-z]*.*$");
+        gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        urlPattern = Pattern.compile("^(?i)https?://[a-z0-9]*.[a-z]*.*$");
     }
 
 
     public static String toJson(Object object) {
-        return GSON.toJson(object);
+        return gson.toJson(object);
     }
     public static <T> T fromJson(String json, Class<T> clazz) {
-        return GSON.fromJson(json, clazz);
+        return gson.fromJson(json, clazz);
     }
     public static <T> T fromJson(Reader reader, Class<T> clazz) {
-        return GSON.fromJson(reader, clazz);
+        return gson.fromJson(reader, clazz);
     }
 
     public static void sleep(TimeUnit unit, long time) {
@@ -41,7 +41,7 @@ public class Utils {
     }
 
     public static boolean isValidURL(String url) {
-        return URL_PATTERN.matcher(url).matches();
+        return urlPattern.matcher(url).matches();
     }
 
     public static String sizeFormat(long size) {

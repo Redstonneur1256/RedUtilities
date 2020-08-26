@@ -30,7 +30,7 @@ public class ImageHelper {
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 int rgb = image.getRGB(x, y);
-                a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF000000;
+                a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF;
                 r += (rgb >> 16) & 0xFF;
                 g += (rgb >> 8) & 0xFF;
                 b += (rgb) & 0xFF;
