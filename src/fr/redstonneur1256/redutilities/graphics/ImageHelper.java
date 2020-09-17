@@ -10,11 +10,19 @@ import java.util.Arrays;
 public class ImageHelper {
 
     public static BufferedImage resize(BufferedImage image, int width, int height) {
-        BufferedImage copy = new BufferedImage(width, height, image.getType());
+        return resize(image, width, height, image.getType());
+    }
+
+    public static BufferedImage resize(BufferedImage image, int width, int height, int type) {
+        BufferedImage copy = new BufferedImage(width, height, type);
         Graphics graphics = copy.getGraphics();
         graphics.drawImage(image, 0, 0, width, height, null);
         graphics.dispose();
         return copy;
+    }
+
+    public static BufferedImage changeFormat(BufferedImage image, int newImageType) {
+        return resize(image, image.getWidth(), image.getHeight(), newImageType);
     }
 
     public static BufferedImage copy(BufferedImage original) {

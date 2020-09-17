@@ -8,6 +8,7 @@ import java.util.*;
 public class JDownload {
 
     public static final int defaultBuffer;
+
     static {
         defaultBuffer = 1024 * 8; // 8 KB Buffer
     }
@@ -17,6 +18,7 @@ public class JDownload {
     private byte[] buffer;
     private Map<String, String> properties;
     private List<Listener> listeners;
+    private float refreshRate;
     private Status status;
     private InputStream input;
     private long downloadSize;
@@ -30,6 +32,7 @@ public class JDownload {
         this.properties = new HashMap<>();
         this.status = Status.stopped;
         this.listeners = new ArrayList<>();
+        this.refreshRate = 1;
 
         this.input = null;
         this.downloadSize = -1;
@@ -56,6 +59,7 @@ public class JDownload {
         this.properties = new HashMap<>(original.properties);
         this.status = Status.stopped;
         this.listeners = new ArrayList<>(original.listeners);
+        this.refreshRate = original.refreshRate;
 
         this.input = null;
         this.downloadSize = -1;
@@ -94,6 +98,7 @@ public class JDownload {
                     case 301:
                     case 302:
                         url = connection.getHeaderField("Location");
+                        setStatus(Status.stopped);
                         if(shouldRetry) {
                             connect(false);
                         }
@@ -113,7 +118,7 @@ public class JDownload {
             setStatus(Status.connected);
         }catch(IOException exception) {
             setStatus(Status.stopped);
-            throw new IOException(exception);
+            throw exception;
         }
     }
 
@@ -123,18 +128,22 @@ public class JDownload {
         }
         setStatus(Status.downloading);
 
+        float refreshRate = this.refreshRate;
+        long time = (long) (1000 / refreshRate);
+
         Timer updateTimer = new Timer("JDownload Speed");
         updateTimer.schedule(new TimerTask() {
             private long lastDownloadedBytes = downloadedBytes;
+
             @Override
             public void run() {
-                speed = (downloadedBytes - lastDownloadedBytes);
+                speed = (long) ((downloadedBytes - lastDownloadedBytes) * refreshRate);
                 lastDownloadedBytes = downloadedBytes;
                 for(Listener listener : listeners) {
                     listener.speedChanged(speed);
                 }
             }
-        }, 1000, 1000);
+        }, time, time);
 
         int count;
         while(status == Status.downloading) {
@@ -207,11 +216,46 @@ public class JDownload {
         return builder.toString();
     }
 
-    public String getURL() { return url; }
-    public Status getStatus() { return status; }
-    public long getDownloadSize() { return downloadSize; }
-    public long getDownloadedBytes() { return downloadedBytes; }
-    public long getSpeed() { return speed; }
+    /**
+     * Define how much time JDownload.Listener#speedChanged(long) must be called per seconds
+     * Higher value = more updates but can some times return 0 if the buffer is too big
+     * Lower value = Better result
+     *
+     * @param refreshRate the amount of updates per second
+     */
+    public void setRefreshRate(long refreshRate) {
+        this.refreshRate = refreshRate;
+    }
+
+    public String getURL() {
+        return url;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    private void setStatus(Status status) {
+        this.status = status;
+
+        for(Listener listener : listeners) {
+            listener.statusChanged(status);
+        }
+    }
+
+    public long getDownloadSize() {
+        return downloadSize;
+    }
+
+    public long getDownloadedBytes() {
+        return downloadedBytes;
+    }
+
+    public long getSpeed() {
+        return speed;
+    }
+
+    /* Classes */
 
     /**
      * @return the download progress from 0 to 1 or -1 if the download size is unknown
@@ -219,8 +263,6 @@ public class JDownload {
     public double getProgress() {
         return downloadSize == -1 ? -1 : downloadedBytes / (double) downloadSize;
     }
-
-    /* Classes */
 
     public enum Status {
         stopped,
@@ -233,31 +275,28 @@ public class JDownload {
 
     public interface Listener {
         void speedChanged(long speed);
+
         void statusChanged(Status status);
+
         void downloadComplete();
-    }
-
-    public static class ListenerAdapter implements Listener {
-
-        @Override
-        public void speedChanged(long speed) { }
-
-        @Override
-        public void statusChanged(Status status) { }
-
-        @Override
-        public void downloadComplete() { }
-
     }
 
     /* Internal methods */
 
-    private void setStatus(Status status) {
-        this.status = status;
+    public static class ListenerAdapter implements Listener {
 
-        for(Listener listener : listeners) {
-            listener.statusChanged(status);
+        @Override
+        public void speedChanged(long speed) {
         }
+
+        @Override
+        public void statusChanged(Status status) {
+        }
+
+        @Override
+        public void downloadComplete() {
+        }
+
     }
 
 }
