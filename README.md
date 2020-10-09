@@ -11,7 +11,7 @@ Download the jar file from [releases page](https://github.com/Redstonneur1256/Re
 Option 2: Using gradle
 -----
 ```gradle
-ext.redUtilitiesVersion = "1.2"
+ext.redUtilitiesVersion = "1.3"
 ext.remoteDownload = { String url, String name ->
     File file = new File("$buildDir/lib/${name}");
     if (!file.exists()) {
