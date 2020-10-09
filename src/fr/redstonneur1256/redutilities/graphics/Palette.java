@@ -30,6 +30,9 @@ public class Palette<T extends Palette.ColorContainer> {
 
     public Palette<T> useCache(boolean use) {
         this.useCache = use;
+        if(!use) {
+            clearCache();
+        }
         return this;
     }
 
@@ -38,6 +41,15 @@ public class Palette<T extends Palette.ColorContainer> {
     public Palette<T> addColor(T t) {
         this.colors.add(t);
         return this;
+    }
+
+    public Palette<T> clearCache() {
+        cachedColors.clear();
+        return this;
+    }
+
+    public int cacheSize() {
+        return cachedColors.size();
     }
 
     public List<T> getColors() {
