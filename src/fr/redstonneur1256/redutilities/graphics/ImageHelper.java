@@ -1,6 +1,7 @@
 package fr.redstonneur1256.redutilities.graphics;
 
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.font.TextLayout;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -8,6 +9,21 @@ import java.awt.image.*;
 import java.util.Arrays;
 
 public class ImageHelper {
+
+    private static final ColorConvertOp grayConvertor;
+
+    static {
+        grayConvertor = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+    }
+
+    public static BufferedImage color(BufferedImage image, Color color) {
+        image = copy(image);
+        Graphics graphics = image.getGraphics();
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics.dispose();
+        return image;
+    }
 
     public static BufferedImage resize(BufferedImage image, int width, int height) {
         return resize(image, width, height, image.getType());
@@ -35,8 +51,8 @@ public class ImageHelper {
         int g = 0;
         int b = 0;
         boolean hasAlpha = hasAlpha(image);
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
+        for(int x = 0; x < image.getWidth(); x++) {
+            for(int y = 0; y < image.getHeight(); y++) {
                 int rgb = image.getRGB(x, y);
                 a += hasAlpha ? (rgb >> 24) & 0xFF : 0xFF;
                 r += (rgb >> 16) & 0xFF;
@@ -52,7 +68,7 @@ public class ImageHelper {
         g = (int) Math.floor(g / size);
         b = (int) Math.floor(b / size);
 
-        return  ((a & 0xFF) << 24) |
+        return ((a & 0xFF) << 24) |
                 ((r & 0xFF) << 16) |
                 ((g & 0xFF) << 8) |
                 (b & 0xFF);
@@ -98,8 +114,10 @@ public class ImageHelper {
     }
 
     public static void drawCenterText(Graphics graphics, String text, int x, int y) {
-        int stringWidth = (int) graphics.getFontMetrics().getStringBounds(text, graphics).getWidth();
-        graphics.drawString(text, x - (stringWidth / 2), y);
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        Rectangle2D bounds = fontMetrics.getStringBounds(text, graphics);
+        int width = (int) bounds.getWidth();
+        graphics.drawString(text, x - (width / 2), y + fontMetrics.getDescent());
     }
 
     public static void drawCenterTextShadowed(Graphics2D graphics, String text, int x, int y) {
@@ -127,6 +145,12 @@ public class ImageHelper {
 
         graphics.setPaint(Color.WHITE);
         layout.draw(graphics, x - (stringWidth / 2F), y);
+    }
+
+    public static BufferedImage convertBlackAndWhite(BufferedImage image) {
+        BufferedImage output = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        grayConvertor.filter(image, output);
+        return output;
     }
 
 }
