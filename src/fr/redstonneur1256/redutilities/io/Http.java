@@ -12,17 +12,22 @@ public class Http {
     private String url;
     private Map<String, String> properties;
     private int timeout;
-    private String method;
+    private Method method;
     private byte[] payload;
     private Proxy proxy;
     private int responseCode;
+
     public Http(String url) {
         this.url = url;
         this.properties = new HashMap<>();
         this.timeout = 1000;
-        this.method = "GET";
+        this.method = Method.get;
         this.payload = null;
         this.proxy = Proxy.NO_PROXY;
+    }
+
+    public static Http url(String url) {
+        return new Http(url);
     }
 
     public Http property(String name, String value) {
@@ -35,7 +40,7 @@ public class Http {
         return this;
     }
 
-    public Http method(String method) {
+    public Http method(Method method) {
         this.method = method;
         return this;
     }
@@ -53,7 +58,7 @@ public class Http {
     public InputStream openSilent() {
         try {
             return open();
-        }catch (IOException exception) {
+        }catch(IOException exception) {
             return null;
         }
     }
@@ -61,15 +66,16 @@ public class Http {
     public InputStream open() throws IOException {
         URL url = new URL(this.url);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
+        for(Map.Entry<String, String> entry : properties.entrySet()) {
+            connection.addRequestProperty(entry.getKey(), entry.getValue());
+        }
         connection.setConnectTimeout(timeout);
-        connection.setRequestMethod(method);
+        connection.setRequestMethod(method.name().toUpperCase());
         if(payload != null) {
             connection.setDoOutput(true);
             OutputStream output = connection.getOutputStream();
             output.write(payload);
-        }
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            connection.addRequestProperty(entry.getKey(), entry.getValue());
+            output.flush();
         }
         responseCode = connection.getResponseCode();
         return responseCode / 100 == 2 ? connection.getInputStream() : connection.getErrorStream();
@@ -78,7 +84,7 @@ public class Http {
     public String readSilent() {
         try {
             return read();
-        } catch (IOException e) {
+        }catch(IOException e) {
             return null;
         }
     }
@@ -97,8 +103,14 @@ public class Http {
         return responseCode;
     }
 
-    public static Http url(String url) {
-        return new Http(url);
+    public enum Method {
+        get,
+        post,
+        head,
+        options,
+        put,
+        delete,
+        trace
     }
 
 }
