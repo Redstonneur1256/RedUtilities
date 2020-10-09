@@ -223,7 +223,7 @@ public class JDownload {
      *
      * @param refreshRate the amount of updates per second
      */
-    public void setRefreshRate(long refreshRate) {
+    public void setRefreshRate(float refreshRate) {
         this.refreshRate = refreshRate;
     }
 
