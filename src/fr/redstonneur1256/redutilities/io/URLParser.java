@@ -6,6 +6,7 @@ import java.util.Map;
 public class URLParser {
 
     private Map<String, String> data;
+
     public URLParser(String string) {
         data = new HashMap<>();
         if(string.contains("?")) {
@@ -16,7 +17,7 @@ public class URLParser {
                 if(index == -1) {
                     data.put(s, null);
                 }else {
-                    data.put(s.substring(0, index), s.substring(index+1));
+                    data.put(s.substring(0, index), s.substring(index + 1));
                 }
             }
         }

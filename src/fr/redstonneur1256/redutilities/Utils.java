@@ -79,13 +79,13 @@ public class Utils {
 
     public static String binaryToHex(byte[] data) {
         StringBuilder builder = new StringBuilder(data.length * 2);
-        for (byte b : data) {
+        for(byte b : data) {
             builder.append(hexCodes[(b >> 4) & 0xF]);
             builder.append(hexCodes[b & 0xF]);
         }
         return builder.toString();
     }
-    
+
     public static byte[] hexToBinary(String hex) {
         String hexCode = new String(hexCodes);
         byte[] data = new byte[hex.length() / 2];
@@ -96,5 +96,5 @@ public class Utils {
         }
         return data;
     }
-    
+
 }

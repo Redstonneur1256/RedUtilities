@@ -11,6 +11,7 @@ public class ColoredSelectionBar extends ColoredBar implements MouseListener, Mo
 
     private boolean dragging;
     private List<Listener> changeListeners;
+
     public ColoredSelectionBar(Color emptyColor) {
         super(emptyColor);
         init();

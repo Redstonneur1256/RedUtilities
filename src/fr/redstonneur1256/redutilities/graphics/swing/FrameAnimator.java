@@ -10,11 +10,13 @@ public class FrameAnimator {
     public static final int normal;
     public static final int fast;
     private static final Runnable nothing;
+
     static {
         slow = 20;
         normal = 10;
         fast = 5;
-        nothing = () -> {};
+        nothing = () -> {
+        };
     }
 
     public static void fadeIn(JFrame frame) {

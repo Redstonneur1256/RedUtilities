@@ -1,9 +1,12 @@
 package fr.redstonneur1256.redutilities.reflection;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Reflection {
     public static RField getField(Class<?> clazz, String name, boolean declared) {
+        Objects.requireNonNull(clazz, "Class cannot be null");
+        Objects.requireNonNull(name, "Name cannot be null");
         try {
             return new RField(declared ? clazz.getDeclaredField(name) : clazz.getField(name));
         }catch(NoSuchFieldException e) {
@@ -12,6 +15,8 @@ public class Reflection {
     }
 
     public static RMethod getMethod(Class<?> clazz, String name, boolean declared, Class<?>... parameters) {
+        Objects.requireNonNull(clazz, "Class cannot be null");
+        Objects.requireNonNull(name, "Name cannot be null");
         try {
             return new RMethod(declared ? clazz.getDeclaredMethod(name, parameters) : clazz.getMethod(name, parameters));
         }catch(NoSuchMethodException e) {
@@ -20,9 +25,10 @@ public class Reflection {
     }
 
     public static RConstructor getConstructor(Class<?> clazz, boolean declared, Class<?>... parameters) {
+        Objects.requireNonNull(clazz, "Class cannot be null");
         try {
             return new RConstructor(declared ? clazz.getDeclaredConstructor(parameters) : clazz.getConstructor(parameters));
-        }catch(NoSuchMethodException e) {
+        }catch(Exception e) {
             throw new IllegalArgumentException((declared ? "declared" : "not declared") + " constructor (" +
                     Arrays.toString(parameters) + ") does not exist for class " + clazz.getName());
         }
@@ -39,9 +45,8 @@ public class Reflection {
     public static Class<?> getClass(String name) {
         try {
             return Class.forName(name);
-        }catch(ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+        }catch(Exception e) {
+            throw new IllegalStateException("Class not found " + name);
         }
     }
 

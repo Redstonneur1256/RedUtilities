@@ -10,6 +10,7 @@ public class Timer {
     private HashMap<String, SubTimer> timers;
     private Runnable onEnd;
     private boolean running = false;
+
     Timer(HashMap<String, SubTimer> timers, Runnable onEnd) {
         this.timers = timers;
         this.onEnd = onEnd;
@@ -23,7 +24,8 @@ public class Timer {
         new Thread(() -> {
             try {
                 start0();
-            } catch (Exception ignored) { }
+            }catch(Exception ignored) {
+            }
         }).start();
     }
 
@@ -39,7 +41,7 @@ public class Timer {
 
         while(running) {
             boolean dontSleep = false;
-            for (SubTimer timer : timers.values()) {
+            for(SubTimer timer : timers.values()) {
                 if(!timer.execute())
                     dontSleep = true;
             }
@@ -49,7 +51,7 @@ public class Timer {
             if(info + 1000 < System.currentTimeMillis()) {
                 info += 1000;
                 StringBuilder infoBuilder = new StringBuilder();
-                for (Map.Entry<String, SubTimer> entry : timers.entrySet()) {
+                for(Map.Entry<String, SubTimer> entry : timers.entrySet()) {
                     SubTimer timer = entry.getValue();
                     String name = entry.getKey();
                     int count = timer.getCount();

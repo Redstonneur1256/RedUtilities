@@ -40,7 +40,7 @@ public class Google {
             }
             JSONArray items = object.getJSONArray("items");
 
-            for (int i = 0; i < items.length(); i++) {
+            for(int i = 0; i < items.length(); i++) {
                 JSONObject jsonResult = items.getJSONObject(i);
                 Result result = new Result(
                         cleanString(jsonResult.getString("title")),
@@ -50,27 +50,12 @@ public class Google {
                 list.add(result);
             }
 
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
         }
 
         return list;
     }
-
-    public static class Result {
-        private String title;
-        private String snippet;
-        private String link;
-        public Result(String title, String snippet, String link) {
-            this.title = title;
-            this.snippet = snippet;
-            this.link = link;
-        }
-        public String getTitle() { return title; }
-        public String getSnippet() { return snippet; }
-        public String getLink() { return link; }
-    }
-
 
     private static String cleanString(String uncleanString) {
         return StringEscapeUtils.unescapeJava(
@@ -79,6 +64,30 @@ public class Google {
                                 .replaceAll("\\s+", " ")
                                 .replaceAll("<.*?>", "")
                                 .replaceAll("\"", "")));
+    }
+
+    public static class Result {
+        private String title;
+        private String snippet;
+        private String link;
+
+        public Result(String title, String snippet, String link) {
+            this.title = title;
+            this.snippet = snippet;
+            this.link = link;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getSnippet() {
+            return snippet;
+        }
+
+        public String getLink() {
+            return link;
+        }
     }
 
 }

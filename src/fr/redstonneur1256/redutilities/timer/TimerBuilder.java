@@ -6,6 +6,7 @@ public class TimerBuilder {
 
     private HashMap<String, SubTimer> timers = new HashMap<>();
     private Runnable onEnd;
+
     public static TimerBuilder of() {
         return new TimerBuilder();
     }

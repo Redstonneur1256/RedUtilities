@@ -8,6 +8,7 @@ class SubTimer {
     private long lastRunTime;
     private int count;
     private double average;
+
     SubTimer(long runs, Runnable consumer) {
         this.runs = runs;
         this.executionTime = 1_000_000_000L / runs;

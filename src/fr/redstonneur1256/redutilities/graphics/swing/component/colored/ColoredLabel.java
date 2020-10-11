@@ -9,6 +9,7 @@ import java.awt.*;
 public class ColoredLabel extends AbstractLabel {
 
     private Color textColor;
+
     public ColoredLabel() {
         this("", Color.BLACK);
     }

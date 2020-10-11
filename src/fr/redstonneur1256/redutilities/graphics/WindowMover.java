@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 public class WindowMover extends MouseAdapter {
     private JFrame frame;
     private int x, y;
+
     public WindowMover(JFrame frame) {
         this.frame = frame;
     }

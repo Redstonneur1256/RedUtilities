@@ -12,7 +12,7 @@ sourceSets.main.resources.srcDirs = []
 compileJava.options.encoding = "UTF-8"
 
 shadowJar {
-    archiveFileName = "RedUtilities.jar"
+    archiveFileName = "RedUtilities-${archiveVersion}.jar"
 }
 
 repositories {

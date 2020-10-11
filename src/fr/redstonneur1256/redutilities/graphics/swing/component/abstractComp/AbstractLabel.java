@@ -5,7 +5,10 @@ import javax.swing.*;
 public class AbstractLabel extends JComponent {
 
     private String text;
-    public AbstractLabel() { }
+
+    public AbstractLabel() {
+    }
+
     public AbstractLabel(String text) {
         this.text = text;
     }

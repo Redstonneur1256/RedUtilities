@@ -4,7 +4,8 @@ import fr.redstonneur1256.redutilities.io.compression.Compression;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.zip.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class GZip implements Compression.CompressionProcessor {
 

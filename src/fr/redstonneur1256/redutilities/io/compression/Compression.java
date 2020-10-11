@@ -1,8 +1,8 @@
 package fr.redstonneur1256.redutilities.io.compression;
 
 import fr.redstonneur1256.redutilities.io.compression.methods.GZip;
-import fr.redstonneur1256.redutilities.io.compression.methods.Zip;
 import fr.redstonneur1256.redutilities.io.compression.methods.ZLib;
+import fr.redstonneur1256.redutilities.io.compression.methods.Zip;
 
 import java.io.ByteArrayOutputStream;
 
@@ -13,18 +13,28 @@ public class Compression {
     private static int bufferSize;
     private static ByteArrayOutputStream output;
     private static byte[] tempBuffer;
+
     static {
         setMethod(Method.zLib);
         setThreadSafe(false);
         setBufferSize(1024);
     }
 
-    public static void setMethod(Method method) { setProcessor(method.processor); }
-    public static void setProcessor(CompressionProcessor processor) { Compression.processor = processor; }
+    public static void setMethod(Method method) {
+        setProcessor(method.processor);
+    }
+
+    public static void setProcessor(CompressionProcessor processor) {
+        Compression.processor = processor;
+    }
+
     /**
      * Set if the compression can be used by multiple thread at same time, if true a common buffer will be used, else a new buffed will be created each time
      */
-    public static void setThreadSafe(boolean threadSafe) { Compression.threadSafe = threadSafe; }
+    public static void setThreadSafe(boolean threadSafe) {
+        Compression.threadSafe = threadSafe;
+    }
+
     public static void setBufferSize(int bufferSize) {
         Compression.bufferSize = bufferSize;
         Compression.output = new ByteArrayOutputStream(bufferSize);
@@ -63,6 +73,7 @@ public class Compression {
         zLib(new ZLib());
 
         private CompressionProcessor processor;
+
         Method(CompressionProcessor processor) {
             this.processor = processor;
         }
@@ -71,6 +82,7 @@ public class Compression {
     public interface CompressionProcessor {
 
         void compress(byte[] input, ByteArrayOutputStream output, byte[] buffer, boolean threadSafe) throws Exception;
+
         void decompress(byte[] input, ByteArrayOutputStream output, byte[] buffer, boolean threadSafe) throws Exception;
 
     }

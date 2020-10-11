@@ -4,8 +4,6 @@ import org.apache.commons.lang3.Validate;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class AbstractBar extends JComponent {

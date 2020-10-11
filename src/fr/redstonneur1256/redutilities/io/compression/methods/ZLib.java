@@ -10,6 +10,7 @@ public class ZLib implements Compression.CompressionProcessor {
 
     private static Inflater commonInflater;
     private static Deflater commonDeflater;
+
     static {
         commonInflater = new Inflater();
         commonDeflater = new Deflater();
@@ -39,7 +40,7 @@ public class ZLib implements Compression.CompressionProcessor {
             output.write(buffer, 0, count);
         }
         if(threadSafe) // Not the public one, close it
-           inflater.end();
+            inflater.end();
 
     }
 
