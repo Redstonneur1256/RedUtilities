@@ -13,7 +13,7 @@ Option 2: Using gradle
 
 * Github download:
 ```groovy
-ext.redUtilitiesVersion = "1.3"
+ext.redUtilitiesVersion = "1.3.1"
 ext.remoteDownload = { String url, String name ->
     File file = new File("$buildDir/lib/${name}")
     if (!file.exists()) {
