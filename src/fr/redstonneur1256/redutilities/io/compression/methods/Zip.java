@@ -10,10 +10,16 @@ import java.util.zip.ZipOutputStream;
 
 public class Zip implements Compression.CompressionProcessor {
 
+    private static final String entryName;
+
+    static {
+        entryName = "content";
+    }
+
     @Override
     public void compress(byte[] input, ByteArrayOutputStream output, byte[] buffer, boolean threadSafe) throws Exception {
         ZipOutputStream zipOutput = new ZipOutputStream(output);
-        zipOutput.putNextEntry(new ZipEntry("content"));
+        zipOutput.putNextEntry(new ZipEntry(entryName));
         zipOutput.write(input, 0, input.length);
         zipOutput.closeEntry();
         zipOutput.close();
@@ -22,8 +28,10 @@ public class Zip implements Compression.CompressionProcessor {
     @Override
     public void decompress(byte[] input, ByteArrayOutputStream output, byte[] buffer, boolean threadSafe) throws Exception {
         ZipInputStream zipInput = new ZipInputStream(new ByteArrayInputStream(input));
-        zipInput.getNextEntry();
-
+        ZipEntry entry = zipInput.getNextEntry();
+        if(!entry.getName().equals(entryName)) {
+            throw new IllegalStateException("The first zip entry is not the content entry.");
+        }
         int count;
         do {
             count = zipInput.read(buffer);
