@@ -7,6 +7,7 @@ import java.awt.*;
 public class PlaceHolderTextField extends JTextField {
 
     private String placeHolder;
+
     public PlaceHolderTextField() {
     }
 
