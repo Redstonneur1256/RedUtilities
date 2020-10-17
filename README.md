@@ -13,7 +13,7 @@ Option 2: Using gradle
 
 * Github download:
 ```groovy
-ext.redUtilitiesVersion = "1.3.1"
+ext.redUtilitiesVersion = "1.3.2"
 ext.remoteDownload = { String url, String name ->
     File file = new File("$buildDir/lib/${name}")
     if (!file.exists()) {
@@ -41,5 +41,3 @@ Steps:
     - `git pull`
     - `gradlew publishMavenPublicationToMavenLocal`
   - Declare `mavenLocal()` in build.gradle repositories of your project and `compile 'fr.redstonneur1256:RedUtilities:x.y.z` in the dependencies.
-  
- 
