@@ -136,6 +136,20 @@ public class Palette<T extends Palette.ColorContainer> {
         return closest;
     }
 
+    public static class Container<T> extends ColorContainer {
+
+        private T value;
+        public Container(T value, Color color) {
+            super(color);
+            this.value = value;
+        }
+
+        public T getValue() {
+            return value;
+        }
+
+    }
+
     public static class ColorContainer {
         private Color color;
 
