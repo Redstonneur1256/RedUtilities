@@ -4,10 +4,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class Palette<T extends Palette.ColorContainer> {
@@ -139,6 +137,19 @@ public class Palette<T extends Palette.ColorContainer> {
     public static class Container<T> extends ColorContainer {
 
         private T value;
+
+        private Container(int color, T value) {
+            this(value, color);
+        }
+
+        public Container(Color color, T value) {
+            this(value, color);
+        }
+
+        public Container(T value, int color) {
+            this(value, new Color(color));
+        }
+
         public Container(T value, Color color) {
             super(color);
             this.value = value;

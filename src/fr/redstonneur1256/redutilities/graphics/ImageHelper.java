@@ -75,6 +75,25 @@ public class ImageHelper {
 
     }
 
+    public static int getOpposite(int color) {
+        float[] hsb = Color.RGBtoHSB(color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, null);
+
+        float brightness = hsb[2];
+
+        if(brightness == 0) {
+            return 0xFFFFFF; // White
+        }
+        if(brightness == 1) {
+            return 0x000000; // Black
+        }
+
+        if(brightness < 0.5F) {
+            hsb[2] = (brightness + 0.5F) % 1.0F;
+        }
+
+        return Color.HSBtoRGB((hsb[0] + 0.5F) % 1.0F, hsb[1], hsb[2]);
+    }
+
     public static boolean hasAlpha(BufferedImage image) {
         int type = image.getType();
         return type == BufferedImage.TYPE_INT_ARGB || type == BufferedImage.TYPE_INT_ARGB_PRE ||

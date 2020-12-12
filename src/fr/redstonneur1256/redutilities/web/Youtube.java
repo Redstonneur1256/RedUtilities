@@ -18,4 +18,23 @@ public class Youtube {
         return null;
     }
 
+    public static String getThumbnailURL(String videoID, Quality quality) {
+        return "http://i.ytimg.com/vi/" + videoID + "/" + quality.name + ".jpg";
+    }
+
+    public enum Quality {
+
+        low("sddefault"),
+        medium("mqdefault"),
+        high("hqdefault"),
+        max("maxresdefault");
+
+        private final String name;
+
+        Quality(String name) {
+            this.name = name;
+        }
+
+    }
+
 }

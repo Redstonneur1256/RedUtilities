@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -33,18 +32,6 @@ public class Utils {
 
     public static <T> T fromJson(Reader reader, Class<T> clazz) {
         return gson.fromJson(reader, clazz);
-    }
-
-    public static void sleep(TimeUnit unit, long time) {
-        sleep(unit.toMillis(time));
-    }
-
-    public static void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        }catch(InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static boolean isValidURL(String url) {
@@ -74,7 +61,7 @@ public class Utils {
         PrintWriter writer = new PrintWriter(output);
         throwable.printStackTrace(writer);
         writer.close();
-        return new String(output.toByteArray());
+        return output.toString();
     }
 
     public static String binaryToHex(byte[] data) {
