@@ -27,8 +27,8 @@ public class RConstructor {
     public <T> T build(Object... parameters) {
         try {
             return (T) constructor.newInstance(parameters);
-        }catch(InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            return null;
+        }catch(InstantiationException | IllegalAccessException | InvocationTargetException exception) {
+            throw new RuntimeException(exception);
         }
     }
 }

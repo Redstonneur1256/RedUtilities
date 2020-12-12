@@ -1,6 +1,6 @@
 package fr.redstonneur1256.redutilities.graphics.swing;
 
-import fr.redstonneur1256.redutilities.Utils;
+import fr.redstonneur1256.redutilities.async.Threads;
 
 import javax.swing.*;
 
@@ -52,16 +52,14 @@ public class FrameAnimator {
     }
 
     private static void fade(JFrame frame, int speed, boolean inverted, Runnable callback) {
-        Thread thread = new Thread(() -> {
+        Threads.daemon("Fade", () -> {
             for(int i = 0; i < 100; i++) {
                 float opacity = i / 100.0F;
                 frame.setOpacity(inverted ? opacity : 1 - opacity);
-                Utils.sleep(speed);
+                Threads.sleep(speed);
             }
             callback.run();
-        }, "WindowFade");
-        thread.setDaemon(true);
-        thread.start();
+        });
     }
 
 }

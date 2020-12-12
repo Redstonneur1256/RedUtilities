@@ -45,7 +45,7 @@ public class Reflection {
     public static Class<?> getClass(String name) {
         try {
             return Class.forName(name);
-        }catch(Exception e) {
+        }catch(Exception exception) {
             throw new IllegalStateException("Class not found " + name);
         }
     }

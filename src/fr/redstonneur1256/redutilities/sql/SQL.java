@@ -1,19 +1,10 @@
 package fr.redstonneur1256.redutilities.sql;
 
-import fr.redstonneur1256.redutilities.sql.serialization.SQLReader;
-import fr.redstonneur1256.redutilities.sql.serialization.SQLSerializers;
-import fr.redstonneur1256.redutilities.sql.serialization.SQLSetter;
-import fr.redstonneur1256.redutilities.sql.serialization.Serializer;
-import org.apache.commons.lang3.SerializationException;
+import fr.redstonneur1256.redutilities.sql.serialization.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class SQL {
 
@@ -46,11 +37,16 @@ public class SQL {
         }
     }
 
-    public void disconnect() throws SQLException {
+    public boolean disconnect() {
         if(!isConnected())
-            return;
-        connection.close();
-        connection = null;
+            return false;
+        try {
+            connection.close();
+            connection = null;
+            return true;
+        }catch(Exception exception) {
+            return false;
+        }
     }
 
     public boolean isConnected() {
@@ -93,7 +89,7 @@ public class SQL {
         }catch(SQLException exception) {
             throw exception;
         }catch(Exception exception) {
-            throw new SerializationException("Failed to serialize argument " + argument, exception);
+            throw new RuntimeException("Failed to serialize argument " + argument, exception);
         }
     }
 
@@ -101,7 +97,7 @@ public class SQL {
     public <T> Serializer<T> getSerializer(Class<?> type) {
         Serializer<T> serializer = (Serializer<T>) serializers.get(type);
         if(serializer == null) {
-            throw new SerializationException("No serializer found for " + type);
+            throw new RuntimeException("No serializer found for " + type);
         }
         return serializer;
     }

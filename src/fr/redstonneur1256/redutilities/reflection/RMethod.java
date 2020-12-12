@@ -22,8 +22,8 @@ public class RMethod {
     public Object invoke(Object instance, Object... parameters) {
         try {
             return method.invoke(instance, parameters);
-        }catch(IllegalAccessException | InvocationTargetException e) {
-            return null;
+        }catch(IllegalAccessException | InvocationTargetException exception) {
+            throw new RuntimeException(exception);
         }
     }
 

@@ -206,10 +206,18 @@ public class JDownload {
         return properties.get(name);
     }
 
+    /**
+     * Create a progressbar of the download
+     *
+     * @param length the length of the bar
+     * @param fill the character of the filled part of the bar
+     * @param empty the character of empty part of the bar
+     * @return the progress bar
+     */
     public String createBar(int length, String fill, String empty) {
         int progress = (int) (getProgress() * length);
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(length);
         for(int i = 0; i < length; i++) {
             builder.append(i < progress ? fill : empty);
         }
@@ -280,8 +288,6 @@ public class JDownload {
 
         void downloadComplete();
     }
-
-    /* Internal methods */
 
     public static class ListenerAdapter implements Listener {
 

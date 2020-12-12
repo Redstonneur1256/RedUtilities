@@ -1,34 +1,40 @@
 package fr.redstonneur1256.redutilities.io;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class URLParser {
 
-    private Map<String, String> data;
-
-    public URLParser(String string) {
-        data = new HashMap<>();
-        if(string.contains("?")) {
-            String message = string.split("\\?")[1];
-            String[] parts = message.split("&");
-            for(String s : parts) {
-                int index = s.indexOf("=");
-                if(index == -1) {
-                    data.put(s, null);
-                }else {
-                    data.put(s.substring(0, index), s.substring(index + 1));
-                }
-            }
+    /**
+     * Parse an url arguments to a map, example:
+     * <p>
+     * <pre>http://example.com/?bar=foo&thing</pre>
+     * Results in :
+     * <pre>
+     * bar = foo
+     * thing = null
+     * </pre>
+     *
+     * @param url the url to parse
+     * @return the map of parsed arguments or {@code
+     * Collections#emptyMap
+     * }
+     */
+    public static Map<String, String> parseURL(String url) {
+        int index = url.indexOf('?');
+        if(index == -1) {
+            return Collections.emptyMap();
         }
-    }
-
-    public boolean hasKey(String key) {
-        return data.containsKey(key);
-    }
-
-    public String get(String key) {
-        return data.get(key);
+        url = url.substring(index + 1);
+        Map<String, String> values = new HashMap<>();
+        for(String part : url.split("&")) {
+            int splitIndex = part.indexOf('=');
+            String key = splitIndex == -1 ? part : part.substring(0, splitIndex);
+            String value = splitIndex == -1 ? null : part.substring(splitIndex + 1);
+            values.put(key, value);
+        }
+        return values;
     }
 
 }

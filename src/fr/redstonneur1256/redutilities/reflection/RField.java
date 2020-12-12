@@ -42,7 +42,8 @@ public class RField {
     public void set(Object instance, Object value) {
         try {
             field.set(instance, value);
-        }catch(IllegalAccessException ignored) {
+        }catch(IllegalAccessException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
