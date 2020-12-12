@@ -1,5 +1,7 @@
 package fr.redstonneur1256.redutilities.graphics.swing;
 
+import fr.redstonneur1256.redutilities.graphics.ImageHelper;
+
 import javax.swing.*;
 import javax.swing.text.Document;
 import java.awt.*;
@@ -37,12 +39,14 @@ public class PlaceHolderTextField extends JTextField {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    protected void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
 
         if(placeHolder != null && (getText() == null || getText().isEmpty())) {
-            g.setColor(Color.GRAY);
-            g.drawString(placeHolder, 3, g.getFontMetrics().getAscent());
+            graphics.setColor(Color.GRAY);
+            graphics.setFont(getFont());
+            ImageHelper.drawCenterText(graphics, placeHolder, getWidth() / 2, getHeight() / 2);
         }
     }
+
 }
