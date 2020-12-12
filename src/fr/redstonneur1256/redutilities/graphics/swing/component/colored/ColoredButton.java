@@ -2,9 +2,9 @@ package fr.redstonneur1256.redutilities.graphics.swing.component.colored;
 
 import fr.redstonneur1256.redutilities.graphics.ImageHelper;
 import fr.redstonneur1256.redutilities.graphics.swing.component.abstractComp.AbstractButton;
-import org.apache.commons.lang3.Validate;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class ColoredButton extends AbstractButton {
 
@@ -21,7 +21,7 @@ public class ColoredButton extends AbstractButton {
     }
 
     public ColoredButton(Color color, Color hoverColor, Color disabledColor) {
-        Validate.notNull(color, "Color cannot be null");
+        Objects.requireNonNull(color, "Color cannot be null");
         this.color = color;
         this.hoverColor = hoverColor == null ? color.brighter() : hoverColor;
         this.disabledColor = disabledColor == null ? color.darker() : disabledColor;

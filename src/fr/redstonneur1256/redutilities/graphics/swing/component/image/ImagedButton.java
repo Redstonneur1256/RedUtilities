@@ -2,7 +2,6 @@ package fr.redstonneur1256.redutilities.graphics.swing.component.image;
 
 import fr.redstonneur1256.redutilities.graphics.ImageHelper;
 import fr.redstonneur1256.redutilities.graphics.swing.component.abstractComp.AbstractButton;
-import org.apache.commons.lang3.Validate;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,7 +22,7 @@ public class ImagedButton extends AbstractButton {
     }
 
     public ImagedButton(BufferedImage image, BufferedImage hoverImage, BufferedImage disabledImage) {
-        Validate.notNull(image, "Image cannot be null");
+        Objects.requireNonNull(image, "Image cannot be null");
         this.image = image;
         this.hoverImage = hoverImage == null ? ImageHelper.color(image, new Color(255, 255, 255, 127)) : hoverImage;
         this.disabledImage = disabledImage == null ? ImageHelper.convertBlackAndWhite(image) : disabledImage;

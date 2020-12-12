@@ -8,44 +8,44 @@ import java.io.ByteArrayOutputStream;
 
 public class Compression {
 
-    private static CompressionProcessor processor;
-    private static boolean threadSafe;
-    private static int bufferSize;
-    private static ByteArrayOutputStream output;
-    private static byte[] tempBuffer;
+    private CompressionProcessor processor;
+    private boolean threadSafe;
+    private int bufferSize;
+    private ByteArrayOutputStream output;
+    private byte[] tempBuffer;
 
-    static {
+    public Compression() {
         setMethod(Method.zLib);
         setThreadSafe(false);
         setBufferSize(1024);
     }
 
-    public static void setMethod(Method method) {
+    public void setMethod(Method method) {
         setProcessor(method.processor);
     }
 
-    public static void setProcessor(CompressionProcessor processor) {
-        Compression.processor = processor;
+    public void setProcessor(CompressionProcessor processor) {
+        this.processor = processor;
     }
 
     /**
      * Set if the compression can be used by multiple thread at same time, if true a common buffer will be used, else a new buffed will be created each time
      */
-    public static void setThreadSafe(boolean threadSafe) {
-        Compression.threadSafe = threadSafe;
+    public void setThreadSafe(boolean threadSafe) {
+        this.threadSafe = threadSafe;
     }
 
-    public static void setBufferSize(int bufferSize) {
-        Compression.bufferSize = bufferSize;
-        Compression.output = new ByteArrayOutputStream(bufferSize);
-        Compression.tempBuffer = new byte[bufferSize];
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+        this.output = new ByteArrayOutputStream(bufferSize);
+        this.tempBuffer = new byte[bufferSize];
     }
 
-    public static byte[] decompress(String compressed) throws Exception {
+    public byte[] decompress(String compressed) throws Exception {
         return decompress(compressed.getBytes());
     }
 
-    public static byte[] decompress(byte[] compressed) throws Exception {
+    public byte[] decompress(byte[] compressed) throws Exception {
         ByteArrayOutputStream outputStream = threadSafe ? new ByteArrayOutputStream(bufferSize) : output;
         byte[] buffer = threadSafe ? new byte[bufferSize] : tempBuffer;
 
@@ -54,11 +54,11 @@ public class Compression {
         return outputStream.toByteArray();
     }
 
-    public static byte[] compress(String data) throws Exception {
+    public byte[] compress(String data) throws Exception {
         return compress(data.getBytes());
     }
 
-    public static byte[] compress(byte[] decompressed) throws Exception {
+    public byte[] compress(byte[] decompressed) throws Exception {
         ByteArrayOutputStream outputStream = threadSafe ? new ByteArrayOutputStream(bufferSize) : output;
         byte[] buffer = threadSafe ? new byte[bufferSize] : tempBuffer;
 

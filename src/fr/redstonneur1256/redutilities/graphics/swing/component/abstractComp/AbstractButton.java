@@ -1,13 +1,12 @@
 package fr.redstonneur1256.redutilities.graphics.swing.component.abstractComp;
 
-import org.apache.commons.lang3.Validate;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AbstractButton extends JComponent implements MouseListener {
 
@@ -75,7 +74,7 @@ public class AbstractButton extends JComponent implements MouseListener {
     }
 
     public void setText(String text) {
-        Validate.notNull(text, "Text cannot be null");
+        Objects.requireNonNull(text, "Text cannot be null");
         this.text = text;
         this.repaint();
     }
@@ -85,7 +84,7 @@ public class AbstractButton extends JComponent implements MouseListener {
     }
 
     public void setTextColor(Color textColor) {
-        Validate.notNull(textColor, "Text color cannot be null");
+        Objects.requireNonNull(textColor, "Text color cannot be null");
         this.textColor = textColor;
         this.repaint();
     }

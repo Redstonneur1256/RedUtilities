@@ -2,9 +2,9 @@ package fr.redstonneur1256.redutilities.graphics.swing.component.colored;
 
 import fr.redstonneur1256.redutilities.graphics.ImageHelper;
 import fr.redstonneur1256.redutilities.graphics.swing.component.abstractComp.AbstractLabel;
-import org.apache.commons.lang3.Validate;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class ColoredLabel extends AbstractLabel {
 
@@ -38,7 +38,7 @@ public class ColoredLabel extends AbstractLabel {
     }
 
     public void setTextColor(Color textColor) {
-        Validate.notNull(textColor, "TextColor cannot be null");
+        Objects.requireNonNull(textColor, "TextColor cannot be null");
         this.textColor = textColor;
         this.repaint();
     }

@@ -1,6 +1,6 @@
 package fr.redstonneur1256.redutilities.graphics.swing.component.abstractComp;
 
-import org.apache.commons.lang3.Validate;
+import fr.redstonneur1256.redutilities.Validate;
 
 import javax.swing.*;
 import java.awt.*;
