@@ -1,6 +1,8 @@
 package fr.redstonneur1256.redutilities.io;
 
 
+import fr.redstonneur1256.redutilities.function.Functions;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
@@ -56,11 +58,7 @@ public class Http {
     }
 
     public InputStream openSilent() {
-        try {
-            return open();
-        }catch(IOException exception) {
-            return null;
-        }
+        return Functions.runtime(this::open);
     }
 
     public InputStream open() throws IOException {
@@ -82,14 +80,11 @@ public class Http {
     }
 
     public String readSilent() {
-        try {
-            return read();
-        }catch(IOException e) {
-            return null;
-        }
+        return Functions.runtime(this::read);
     }
 
     public String read() throws IOException {
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(open()));
         StringBuilder output = new StringBuilder();
         String line;
