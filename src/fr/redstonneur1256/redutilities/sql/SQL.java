@@ -53,14 +53,19 @@ public class SQL {
         return connection != null;
     }
 
+    public PreparedStatement prepareStatement(String statement, Object... arguments) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        for(int i = 0; i < arguments.length; i++) {
+            Object argument = arguments[i];
+            set(preparedStatement, i + 1, argument);
+        }
+        return preparedStatement;
+    }
+
     public void execute(String query, Object... arguments) {
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            for(int i = 0; i < arguments.length; i++) {
-                Object argument = arguments[i];
-                set(statement, i + 1, argument);
-            }
-            statement.execute();
+            PreparedStatement statement = prepareStatement(query, arguments);
+            statement.executeUpdate();
             statement.close();
         }catch(Exception exception) {
             handle(exception);
@@ -69,12 +74,7 @@ public class SQL {
 
     public CResultSet executeQuery(String query, Object... arguments) {
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            for(int i = 0; i < arguments.length; i++) {
-                Object argument = arguments[i];
-                set(statement, i + 1, argument);
-            }
-            return new CResultSet(this, statement.executeQuery());
+            return new CResultSet(this, prepareStatement(query, arguments).executeQuery());
         }catch(Exception exception) {
             handle(exception);
             return null;
