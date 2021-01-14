@@ -2,7 +2,7 @@ package fr.redstonneur1256.redutilities.sql.serialization;
 
 import java.sql.ResultSet;
 
-public interface SQLReader<T> {
+public interface SQLGetter<T> {
 
     T get(ResultSet resultSet, String column) throws Exception;
 

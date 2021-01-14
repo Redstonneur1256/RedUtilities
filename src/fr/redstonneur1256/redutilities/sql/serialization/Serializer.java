@@ -3,12 +3,12 @@ package fr.redstonneur1256.redutilities.sql.serialization;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class Serializer<T> implements SQLSetter<T>, SQLReader<T> {
+public class Serializer<T> implements SQLSetter<T>, SQLGetter<T> {
 
     private SQLSetter<T> writer;
-    private SQLReader<T> reader;
+    private SQLGetter<T> reader;
 
-    public Serializer(SQLSetter<T> writer, SQLReader<T> reader) {
+    public Serializer(SQLSetter<T> writer, SQLGetter<T> reader) {
         this.writer = writer;
         this.reader = reader;
     }
@@ -27,7 +27,7 @@ public class Serializer<T> implements SQLSetter<T>, SQLReader<T> {
         return writer;
     }
 
-    public SQLReader<T> getReader() {
+    public SQLGetter<T> getReader() {
         return reader;
     }
 }

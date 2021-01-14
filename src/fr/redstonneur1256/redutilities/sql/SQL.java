@@ -66,7 +66,6 @@ public class SQL {
             }
             parametersString.setLength(parametersString.length() - 1);
         }
-        System.out.println(parametersString);
 
         String url = login.address + "/" + login.base + parametersString.toString();
         connection = DriverManager.getConnection(url, login.name, login.pass);
@@ -145,7 +144,7 @@ public class SQL {
         serializers.put(type, serializer);
     }
 
-    public <T> void registerSerializer(Class<T> type, SQLSetter<T> writer, SQLReader<T> reader) {
+    public <T> void registerSerializer(Class<T> type, SQLSetter<T> writer, SQLGetter<T> reader) {
         registerSerializer(type, new Serializer<>(writer, reader));
     }
 
