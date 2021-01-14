@@ -27,7 +27,7 @@ public class ArrayOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int offset, int len) throws IOException {
+    public void write(byte[] b, int offset, int len) {
         if(len < 0 || offset < 0 || offset + len < 0 || offset + len > b.length || offset > b.length || len > b.length) {
             throw new IndexOutOfBoundsException();
         }

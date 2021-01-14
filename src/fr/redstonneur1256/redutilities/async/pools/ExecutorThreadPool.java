@@ -1,9 +1,7 @@
 package fr.redstonneur1256.redutilities.async.pools;
 
-import fr.redstonneur1256.redutilities.async.Task;
 import fr.redstonneur1256.redutilities.async.ThreadPool;
 import fr.redstonneur1256.redutilities.async.Threads;
-import fr.redstonneur1256.redutilities.function.Provider;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

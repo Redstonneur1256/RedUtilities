@@ -86,7 +86,7 @@ public class DiscStrategy extends ZipStrategy {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         FileUtils.removeDirectory(tempFolder);
     }
 

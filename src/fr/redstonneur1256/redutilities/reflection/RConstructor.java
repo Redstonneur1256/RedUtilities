@@ -1,7 +1,6 @@
 package fr.redstonneur1256.redutilities.reflection;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 
 public class RConstructor<T> extends ReflectiveAdapter<RConstructor<T>> {

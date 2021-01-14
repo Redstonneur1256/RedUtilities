@@ -29,7 +29,7 @@ public class Zip implements Compression.CompressionProcessor {
     public void decompress(byte[] input, ByteArrayOutputStream output, byte[] buffer, boolean threadSafe) throws Exception {
         ZipInputStream zipInput = new ZipInputStream(new ByteArrayInputStream(input));
         ZipEntry entry = zipInput.getNextEntry();
-        if(!entry.getName().equals(entryName)) {
+        if(entry == null || !entry.getName().equals(entryName)) {
             throw new IllegalStateException("The first zip entry is not the content entry.");
         }
         int count;

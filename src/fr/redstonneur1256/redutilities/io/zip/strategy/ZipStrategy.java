@@ -8,7 +8,7 @@ public abstract class ZipStrategy {
 
     public abstract void save(File zipFile) throws IOException;
 
-    public abstract void close() throws IOException;
+    public abstract void close();
 
     public abstract ZipFile open(String path, String name);
 
