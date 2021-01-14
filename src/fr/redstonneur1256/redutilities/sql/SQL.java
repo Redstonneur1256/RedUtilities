@@ -8,10 +8,11 @@ import java.util.Map;
 
 public class SQL {
 
-    private LoginData login;
-    private Map<Class<?>, Serializer<?>> serializers;
-    private boolean silentErrors;
-    private Connection connection;
+    protected LoginData login;
+    protected Map<String, Object> parameters;
+    protected Map<Class<?>, Serializer<?>> serializers;
+    protected boolean silentErrors;
+    protected Connection connection;
 
     public SQL(String address, String base, String name, String pass) {
         this(new LoginData(address, base, name, pass));
@@ -19,22 +20,56 @@ public class SQL {
 
     public SQL(LoginData login) {
         this.login = login;
+        this.parameters = new HashMap<>();
         this.serializers = new HashMap<>();
 
         SQLSerializers.registerDefaults(this);
     }
 
-    public boolean connect() {
-        if(isConnected())
-            return false;
+    public void defaultParameters() {
+        setParameter("autoReconnect", true);
+        setParameter("useUnicode", true);
+        setParameter("characterEncoding", "utf8");
+    }
+
+    public Object getParameter(String key) {
+        return parameters.get(key);
+    }
+
+    public void setParameter(String key, Object value) {
+        parameters.put(key, value);
+    }
+
+    public void removeParameter(String key) {
+        parameters.remove(key);
+    }
+
+    public boolean connectSilent() {
         try {
-            String url = login.address + "/" + login.base + "?autoReconnect=true&useUnicode=true&characterEncoding=utf8";
-            connection = DriverManager.getConnection(url, login.name, login.pass);
+            connect();
             return true;
-        }catch(SQLException exception) {
-            exception.printStackTrace();
+        }catch(Exception ignored) {
             return false;
         }
+    }
+
+    public void connect() throws SQLException {
+        if(isConnected()) {
+            return;
+        }
+
+        StringBuilder parametersString = new StringBuilder();
+        if(!parameters.isEmpty()) {
+            parametersString.append('?');
+            for(Map.Entry<String, Object> entry : parameters.entrySet()) {
+                parametersString.append(entry.getKey()).append('=').append(entry.getValue()).append('&');
+            }
+            parametersString.setLength(parametersString.length() - 1);
+        }
+        System.out.println(parametersString);
+
+        String url = login.address + "/" + login.base + parametersString.toString();
+        connection = DriverManager.getConnection(url, login.name, login.pass);
     }
 
     public boolean disconnect() {
