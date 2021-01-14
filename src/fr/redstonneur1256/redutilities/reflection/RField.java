@@ -1,38 +1,49 @@
 package fr.redstonneur1256.redutilities.reflection;
 
+import fr.redstonneur1256.redutilities.function.Functions;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-public class RField {
+public class RField extends ReflectiveAdapter<RField> {
 
-    private static final RField modifiersField = Reflection.getField(Field.class, "modifiers", true).setAccessible(true);
+    private static final RField modifiersField;
 
-    private final Field field;
+    static {
+        if(Reflect.getJavaVersion() > 8) {
+            modifiersField = null;
+        }else {
+            modifiersField = Reflection
+                    .getField(Field.class, "modifiers")
+                    .setAccessible(true);
+        }
+    }
 
-    RField(Field field) {
+    private Field field;
+
+    public RField(Field field) {
+        super(field);
+
         this.field = field;
     }
 
-    public boolean isAccessible() {
-        return field.isAccessible();
-    }
-
-    public RField setAccessible(boolean accessible) {
-        field.setAccessible(accessible);
-        return this;
-    }
-
-    public boolean isFinal() {
-        return (field.getModifiers() & Modifier.FINAL) != 0;
-    }
 
     public RField setFinal(boolean b) {
-        if(b) {
-            modifiersField.set(field, field.getModifiers() & Modifier.FINAL);
-        }else {
-            modifiersField.set(field, field.getModifiers() & ~Modifier.FINAL);
+        if(modifiersField == null) {
+            throw new IllegalStateException("Cannot remove final from a field with java > 8");
         }
+        int modifiers = b ? field.getModifiers() | Modifier.FINAL : field.getModifiers() & ~Modifier.FINAL;
+        modifiersField.set(field, modifiers);
         return this;
+    }
+
+    public boolean isVolatile() {
+        return hasModifier(Modifier.VOLATILE);
+    }
+
+
+    public Class<?> getType() {
+        return field.getType();
     }
 
     public void set(Object value) {
@@ -40,11 +51,7 @@ public class RField {
     }
 
     public void set(Object instance, Object value) {
-        try {
-            field.set(instance, value);
-        }catch(IllegalAccessException exception) {
-            throw new RuntimeException(exception);
-        }
+        Functions.runtime(() -> field.set(instance, value));
     }
 
     public Object get() {
@@ -52,11 +59,16 @@ public class RField {
     }
 
     public Object get(Object instance) {
-        try {
-            return field.get(instance);
-        }catch(IllegalAccessException e) {
-            return null;
-        }
+        return Functions.runtime(() -> field.get(instance));
+    }
+
+    @Override
+    public int getModifiers() {
+        return field.getModifiers();
+    }
+
+    public Field getField() {
+        return field;
     }
 
 }

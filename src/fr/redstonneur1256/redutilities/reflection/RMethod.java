@@ -1,30 +1,47 @@
 package fr.redstonneur1256.redutilities.reflection;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import fr.redstonneur1256.redutilities.function.Functions;
 
-public class RMethod {
-    private final Method method;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+public class RMethod extends ReflectiveAdapter<RMethod> {
+
+    private Method method;
 
     public RMethod(Method method) {
+        super(method);
+
         this.method = method;
     }
 
-    public boolean isAccessible() {
-        return method.isAccessible();
+    public boolean isSynchronized() {
+        return hasModifier(Modifier.SYNCHRONIZED);
     }
 
-    public RMethod setAccessible(boolean accessible) {
-        method.setAccessible(accessible);
-        return this;
+    public boolean isNative() {
+        return hasModifier(Modifier.NATIVE);
+    }
+
+    public boolean isAbstract() {
+        return hasModifier(Modifier.ABSTRACT);
+    }
+
+    public Class<?> getReturnType() {
+        return method.getReturnType();
     }
 
     public Object invoke(Object instance, Object... parameters) {
-        try {
-            return method.invoke(instance, parameters);
-        }catch(IllegalAccessException | InvocationTargetException exception) {
-            throw new RuntimeException(exception);
-        }
+        return Functions.runtime(() -> method.invoke(instance, parameters));
+    }
+
+    @Override
+    public int getModifiers() {
+        return method.getModifiers();
+    }
+
+    public Method getMethod() {
+        return method;
     }
 
 }
