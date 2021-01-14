@@ -1,10 +1,8 @@
 package fr.redstonneur1256.redutilities.async.pools;
 
-import fr.redstonneur1256.redutilities.async.Task;
 import fr.redstonneur1256.redutilities.async.ThreadPool;
 import fr.redstonneur1256.redutilities.async.Threads;
 import fr.redstonneur1256.redutilities.function.Functions;
-import fr.redstonneur1256.redutilities.function.Provider;
 import fr.redstonneur1256.redutilities.function.UnsafeRunnable;
 
 import java.util.List;
@@ -44,13 +42,6 @@ public class ReusableThreadPool implements ThreadPool {
     @Override
     public boolean isActive() {
         return true;
-    }
-
-    @Override
-    public <T> Task<T> execute(Provider<T> provider) {
-        Task<T> task = new Task<>();
-        execute(() -> task.complete(provider.get()));
-        return task;
     }
 
     @Override

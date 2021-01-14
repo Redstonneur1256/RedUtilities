@@ -34,13 +34,6 @@ public class ExecutorThreadPool implements ThreadPool {
     }
 
     @Override
-    public <T> Task<T> execute(Provider<T> runnable) {
-        Task<T> task = new Task<>();
-        execute(() -> task.complete(runnable.get()));
-        return task;
-    }
-
-    @Override
     public void execute(Runnable runnable) {
         executor.submit(runnable);
     }
