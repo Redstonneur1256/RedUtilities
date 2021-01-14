@@ -2,7 +2,75 @@ package fr.redstonneur1256.redutilities;
 
 import java.awt.*;
 
+@SuppressWarnings("ManualMinMaxCalculation")
 public class Maths {
+
+    /**
+     * Multiply an angle in radians by this to obtain degree
+     */
+    public static final double radianToDegree;
+
+    /**
+     * Multiply an angle in degree by this to obtain radian
+     */
+    public static final double degreeToRadian;
+
+    static {
+        radianToDegree = 180 / Math.PI;
+        degreeToRadian = Math.PI / 180;
+    }
+
+    public static double toDegrees(double radians) {
+        return radians * radianToDegree;
+    }
+
+    public static double toRadians(double degrees) {
+        return degrees * degreeToRadian;
+    }
+
+    public static double cosDegree(double angle) {
+        return StrictMath.cos(angle * degreeToRadian);
+    }
+
+    public static double sinDegree(double angle) {
+        return StrictMath.sin(angle * degreeToRadian);
+    }
+
+    public static double tanDegree(double angle) {
+        return StrictMath.tan(angle * degreeToRadian);
+    }
+
+    public static double toAngle(double x, double y) {
+        double angle = StrictMath.atan2(x, y) * radianToDegree;
+        if(angle < 360) {
+            angle += 360;
+        }
+        return angle;
+    }
+
+    public static byte clamp(byte value, byte min, byte max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static short clamp(short value, short min, short max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static int clamp(int value, int min, int max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static long clamp(long value, long min, long max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static float clamp(float value, float min, float max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    public static double clamp(double value, double min, double max) {
+        return value < min ? min : value > max ? max : value;
+    }
 
     public static byte sum(byte[] values) {
         byte total = 0;
@@ -36,17 +104,17 @@ public class Maths {
         return total;
     }
 
-    public static double sum(double[] values) {
-        double total = 0;
-        for(double value : values) {
+    public static float sum(float[] values) {
+        float total = 0;
+        for(float value : values) {
             total += value;
         }
         return total;
     }
 
-    public static float sum(float[] values) {
-        float total = 0;
-        for(float value : values) {
+    public static double sum(double[] values) {
+        double total = 0;
+        for(double value : values) {
             total += value;
         }
         return total;

@@ -10,12 +10,15 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    public static final String loggerName;
     private static final Gson gson;
     private static final Pattern urlPattern;
     private static final String[] units;
     private static final char[] hexCodes;
 
     static {
+        loggerName = "redUtilities";
+
         gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
         urlPattern = Pattern.compile("^(?i)https?://[a-z0-9]*.[a-z]*.*$");
         units = new String[] {"", "K", "M", "G", "T", "P", "E", "Z, Y"};
