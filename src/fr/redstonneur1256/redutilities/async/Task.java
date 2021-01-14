@@ -156,7 +156,9 @@ public class Task<T> {
     public void onComplete(Consumer<T> action) {
         synchronized(lock) {
             if(have) {
-                action.accept(item);
+                if(exception == null) {
+                    action.accept(item);
+                }
             }else {
                 listeners.add(action);
             }
@@ -165,8 +167,10 @@ public class Task<T> {
 
     public void onFail(Consumer<Throwable> action) {
         synchronized(lock) {
-            if(have && exception != null) {
-                action.accept(exception);
+            if(have) {
+                if(exception != null) {
+                    action.accept(exception);
+                }
             }else {
                 failListeners.add(action);
             }
