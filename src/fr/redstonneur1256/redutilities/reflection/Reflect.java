@@ -7,6 +7,7 @@ import fr.redstonneur1256.redutilities.function.UnsafeProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,6 +74,20 @@ public class Reflect {
             field.set(instance, value);
         }catch(Exception exception) {
             throw new RuntimeException(new NoSuchFieldException(fieldName));
+        }
+    }
+
+    public static <T, C> T invoke(C instance, String method, Object... arguments) {
+        return invoke(instance, (Class<C>) instance.getClass(), method, arguments);
+    }
+
+    public static <T, C> T invoke(C instance, Class<C> type, String method, Object... arguments) {
+        try {
+            Method methodeInstance = getMethod(type, method, Arrays.stream(arguments).map(Object::getClass).toArray(Class[]::new));
+            methodeInstance.setAccessible(true);
+            return (T) methodeInstance.invoke(instance, arguments);
+        }catch(Exception exception) {
+            throw new RuntimeException(exception);
         }
     }
 
