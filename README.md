@@ -19,6 +19,6 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.github.Redstonneur1256:RedUtilities:1.4'
+  implementation 'com.github.Redstonneur1256:RedUtilities:{version}'
 }
 ```
