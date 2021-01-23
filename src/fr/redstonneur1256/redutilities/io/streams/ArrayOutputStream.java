@@ -2,6 +2,7 @@ package fr.redstonneur1256.redutilities.io.streams;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +11,10 @@ public class ArrayOutputStream extends OutputStream {
 
     private int maxArraySize;
     private List<byte[]> data;
+
+    public ArrayOutputStream(int maxArraySize) {
+        this(maxArraySize, new ArrayList<>());
+    }
 
     public ArrayOutputStream(int maxArraySize, List<byte[]> data) {
         this.maxArraySize = maxArraySize;
@@ -62,6 +67,14 @@ public class ArrayOutputStream extends OutputStream {
             off += written;
 
         }
+    }
+
+    public int getMaxArraySize() {
+        return maxArraySize;
+    }
+
+    public List<byte[]> getData() {
+        return data;
     }
 
 }

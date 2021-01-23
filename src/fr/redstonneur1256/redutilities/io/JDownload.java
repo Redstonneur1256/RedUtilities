@@ -3,6 +3,7 @@ package fr.redstonneur1256.redutilities.io;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 public class JDownload {
@@ -83,14 +84,14 @@ public class JDownload {
 
         setStatus(Status.connecting);
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            URLConnection connection = new URL(url).openConnection();
+            HttpURLConnection httpConnection = connection instanceof HttpURLConnection ? (HttpURLConnection) connection : null;
             for(Map.Entry<String, String> property : properties.entrySet()) {
                 connection.addRequestProperty(property.getKey(), property.getValue());
             }
             connection.connect();
 
-            int code = connection.getResponseCode();
-
+            int code = httpConnection == null ? 200 : httpConnection.getResponseCode();
             boolean ok = code / 100 == 2;
 
             if(!ok) {
@@ -112,7 +113,7 @@ public class JDownload {
                 }
             }
 
-            input = ok ? connection.getInputStream() : connection.getErrorStream();
+            input = ok ? connection.getInputStream() : httpConnection.getErrorStream();
             downloadSize = connection.getContentLengthLong();
 
             setStatus(Status.connected);
@@ -269,7 +270,7 @@ public class JDownload {
      * @return the download progress from 0 to 1 or -1 if the download size is unknown
      */
     public double getProgress() {
-        return downloadSize == -1 ? -1 : downloadedBytes / (double) downloadSize;
+        return downloadSize <= 0 ? -1 : downloadedBytes / (double) downloadSize;
     }
 
     public enum Status {

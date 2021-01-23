@@ -1,16 +1,19 @@
 package fr.redstonneur1256.redutilities.io.zip.strategy;
 
 import java.io.*;
+import java.util.List;
 
 public abstract class ZipStrategy {
 
-    public abstract void open(File zipFile) throws IOException;
+    public abstract void load(File zipFile) throws IOException;
 
     public abstract void save(File zipFile) throws IOException;
 
     public abstract void close();
 
     public abstract ZipFile open(String path, String name);
+
+    public abstract List<? extends ZipFile> listFiles();
 
     public static abstract class ZipFile {
 

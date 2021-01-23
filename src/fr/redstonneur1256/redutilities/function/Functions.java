@@ -38,13 +38,7 @@ public class Functions {
     }
 
     public static <I, O, E extends Throwable> Function<I, O> wrapped(UnsafeFunction<I, O, E> function) {
-        return (i) -> {
-            try {
-                return function.apply(i);
-            }catch(Throwable e) {
-                throw new RuntimeException(e);
-            }
-        };
+        return i -> runtime(function, i);
     }
 
 }

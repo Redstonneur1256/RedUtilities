@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Http {
+
     private String url;
     private Map<String, String> properties;
     private int timeout;
@@ -84,7 +85,6 @@ public class Http {
     }
 
     public String read() throws IOException {
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(open()));
         StringBuilder output = new StringBuilder();
         String line;

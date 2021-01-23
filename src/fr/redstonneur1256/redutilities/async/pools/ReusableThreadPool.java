@@ -60,6 +60,10 @@ public class ReusableThreadPool implements ThreadPool {
         worker.postCommand(runnable);
     }
 
+    /**
+     * Shutdown all threads (please note that current tasks are still finished)
+     * The thread pool can still be used and new threads will be created
+     */
     @Override
     public void shutdown() {
         for(ThreadWorker thread : threads) {
@@ -98,6 +102,10 @@ public class ReusableThreadPool implements ThreadPool {
         private void start() {
             thread = factory.newThread(this::run);
             thread.setName("Worker-" + id);
+
+            if(!thread.isAlive()) {
+                thread.start();
+            }
         }
 
         public boolean isUsed() {

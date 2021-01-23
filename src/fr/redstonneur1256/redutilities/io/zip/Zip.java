@@ -4,27 +4,42 @@ import fr.redstonneur1256.redutilities.io.zip.strategy.ZipStrategy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class Zip {
 
-    private File zipFile;
     private ZipStrategy strategy;
+    private boolean opened;
 
-    public Zip(File zipFile, Strategy strategy) {
-        if(zipFile.exists() && zipFile.isDirectory()) {
-            throw new IllegalArgumentException("File " + zipFile + " exist and is a directory");
-        }
-
-        this.zipFile = zipFile;
+    public Zip(Strategy strategy) {
         this.strategy = strategy.getStrategy().get();
+        this.opened = false;
     }
 
-    public void open() throws IOException {
-        strategy.open(zipFile);
+    public void load(File zipFile) throws IOException {
+        if(opened) {
+            throw new IllegalStateException("The Zip is already opened");
+        }
+
+        strategy.load(zipFile);
+        opened = true;
+    }
+
+    public void compress(File zipFile) throws IOException {
+        if(!opened) {
+            throw new IllegalStateException("The Zip file is not opened");
+        }
+
+        strategy.save(zipFile);
     }
 
     public void close() throws IOException {
+        if(!opened) {
+            throw new IllegalStateException("The Zip file is not opened");
+        }
+
         strategy.close();
+        opened = false;
     }
 
     public ZipStrategy.ZipFile open(String name) {
@@ -32,18 +47,15 @@ public class Zip {
     }
 
     public ZipStrategy.ZipFile open(String path, String name) {
+        if(!opened) {
+            throw new IllegalStateException("The Zip file is not opened");
+        }
+
         return strategy.open(path, name);
     }
 
-    /**
-     * Save back all files into the file
-     */
-    public void compress() throws IOException {
-        strategy.save(zipFile);
-    }
-
-    public File getZipFile() {
-        return zipFile;
+    public List<? extends ZipStrategy.ZipFile> listFiles() {
+        return strategy.listFiles();
     }
 
 }

@@ -6,6 +6,8 @@ import fr.redstonneur1256.redutilities.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -14,15 +16,18 @@ import java.util.zip.ZipOutputStream;
 public class DiscStrategy extends ZipStrategy {
 
     private File tempFolder;
+    private List<DiscFileData> files;
 
     public DiscStrategy() {
         tempFolder = Functions.runtime(() -> Files.createTempDirectory("zip" + UUID.randomUUID().toString()).toFile());
     }
 
     @Override
-    public void open(File zipFile) throws IOException {
+    public void load(File zipFile) throws IOException {
         try(FileInputStream fileInput = new FileInputStream(zipFile)) {
             ZipInputStream input = new ZipInputStream(fileInput);
+
+            List<DiscFileData> files = new ArrayList<>();
 
             ZipEntry entry;
             while((entry = input.getNextEntry()) != null) {
@@ -39,9 +44,12 @@ public class DiscStrategy extends ZipStrategy {
                 IOUtils.copy(input, output, 8192);
                 output.close();
 
+                files.add(new DiscFileData(file));
             }
 
             input.close();
+
+            this.files = files;
         }
     }
 
@@ -53,6 +61,9 @@ public class DiscStrategy extends ZipStrategy {
             File[] files = tempFolder.listFiles();
             save(files, output, "");
 
+            tempFolder.delete();
+
+            this.files = null;
         }
     }
 
@@ -80,7 +91,6 @@ public class DiscStrategy extends ZipStrategy {
             output.closeEntry();
 
             input.close();
-
         }
 
     }
@@ -95,9 +105,19 @@ public class DiscStrategy extends ZipStrategy {
         return new DiscFileData(name, path);
     }
 
+    @Override
+    public List<? extends ZipFile> listFiles() {
+        return files;
+    }
+
     private class DiscFileData extends ZipFile {
 
         private File file;
+
+        private DiscFileData(File file) {
+            super(file.getName(), file.getParent());
+            this.file = file;
+        }
 
         public DiscFileData(String name, String path) {
             super(name, path);
