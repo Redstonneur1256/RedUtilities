@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'fr.redstonneur1256'
-version '1.5.2'
+version '1.5.3'
 
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = []

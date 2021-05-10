@@ -15,7 +15,7 @@ public class Validate {
     }
 
     public static void notEmpty(String string, String message) {
-        isTrue(!string.isEmpty(), message);
+        isTrue(string != null && !string.isEmpty(), message);
     }
 
 }
